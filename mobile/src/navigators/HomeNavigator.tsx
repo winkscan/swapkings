@@ -6,6 +6,7 @@ import { RankScreen } from "../screens/RankScreen";
 import { HousesScreen } from "../screens/HousesScreen";
 import { ReferralScreen } from "../screens/ReferralScreen";
 import { GuideScreen } from "../screens/GuideScreen";
+import { FadeOnFocus } from "../components/FadeOnFocus";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { SWAPKINGS_COLORS as C } from "../theme";
 
@@ -56,11 +57,11 @@ export function HomeNavigator() {
         ),
       })}
     >
-      <Tab.Screen name="Houses" component={HousesScreen} />
-      <Tab.Screen name="Swap" component={SwapScreen} />
-      <Tab.Screen name="Rank" component={RankScreen} />
-      <Tab.Screen name="Friends" component={ReferralScreen} />
-      <Tab.Screen name="Guide" component={GuideScreen} />
+      <Tab.Screen name="Houses">{() => <FadeOnFocus><HousesScreen /></FadeOnFocus>}</Tab.Screen>
+      <Tab.Screen name="Swap">{() => <FadeOnFocus><SwapScreen /></FadeOnFocus>}</Tab.Screen>
+      <Tab.Screen name="Rank">{() => <FadeOnFocus><RankScreen /></FadeOnFocus>}</Tab.Screen>
+      <Tab.Screen name="Friends">{() => <FadeOnFocus><ReferralScreen /></FadeOnFocus>}</Tab.Screen>
+      <Tab.Screen name="Guide">{() => <FadeOnFocus><GuideScreen /></FadeOnFocus>}</Tab.Screen>
     </Tab.Navigator>
   );
 }

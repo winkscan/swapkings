@@ -74,8 +74,8 @@ export function HouseDetailScreen({ route, navigation }: Props) {
         {isCurrent ? (
           <Button
             mode="contained"
-            buttonColor={C.bg}
-            textColor={C.textPrimary}
+            buttonColor="#ffffff"
+            textColor="#000000"
             style={styles.bigButton}
             contentStyle={styles.bigButtonContent}
             loading={busy}
@@ -87,8 +87,8 @@ export function HouseDetailScreen({ route, navigation }: Props) {
         ) : (
           <Button
             mode="contained"
-            buttonColor={C.accent}
-            textColor={C.accentTextOn}
+            buttonColor="#ffffff"
+            textColor="#000000"
             style={styles.bigButton}
             contentStyle={styles.bigButtonContent}
             loading={busy}

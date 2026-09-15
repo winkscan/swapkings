@@ -25,6 +25,7 @@ import { formatUsdCompact, shortAddr } from '../swapkings/format'
 import { TokenIcon } from '../components/TokenPill'
 import { BannerImage } from '../components/BannerImage'
 import { PillTabs } from '../components/PillTabs'
+import { Fade } from '../components/Fade'
 import { SWAPKINGS_COLORS as C } from '../theme'
 
 // Client-side-only extra rows a wallet pasted in via the Add House tab (see
@@ -40,19 +41,8 @@ export function HousesScreen() {
   const [tab, setTab] = useState<Tab>('houses')
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { connect } = useMobileWallet()
-  const {
-    guilds: discoveredGuilds,
-    loading,
-    refresh,
-    selectedAccount,
-    currentFounder,
-    currentRow,
-    inAGuild,
-    onJoin,
-    onLeave,
-    busyMint,
-    err,
-  } = useGuildMembership()
+  const { guilds: discoveredGuilds, loading, refresh, selectedAccount, currentFounder, currentRow, err } =
+    useGuildMembership()
 
   const goToHouse = useCallback(
     (tokenMint: string) => {
@@ -101,7 +91,6 @@ export function HousesScreen() {
       const isCurrent = item.founderWallet === currentFounder
       const belowFloor =
         item.marketCapUsd !== undefined && item.marketCapUsd < GUILD_MARKET_CAP_FLOOR_USD
-      const busy = busyMint === item.tokenMint
       return (
         <Card style={styles.row} onPress={() => goToHouse(item.tokenMint)}>
           <Card.Content>
@@ -115,40 +104,24 @@ export function HousesScreen() {
                   {item.symbol || shortAddr(item.tokenMint)}
                 </Text>
               </View>
-              {isCurrent ? (
-                <Button
-                  compact
-                  mode="contained"
-                  buttonColor="#ffffff"
-                  textColor="#000000"
-                  contentStyle={styles.btnPadding}
-                  loading={busy}
-                  disabled={busy || !selectedAccount}
-                  onPress={() => onLeave(item)}
-                >
-                  Leave
-                </Button>
-              ) : (
-                <Button
-                  compact
-                  mode="contained"
-                  buttonColor={C.bgHover}
-                  textColor={C.textPrimary}
-                  contentStyle={styles.btnPadding}
-                  loading={busy}
-                  disabled={busy || belowFloor || !selectedAccount}
-                  onPress={() => onJoin(item)}
-                >
-                  {inAGuild ? 'Switch' : 'Join'}
-                </Button>
-              )}
+              <Button
+                compact
+                mode="contained"
+                buttonColor={isCurrent ? '#ffffff' : C.bgHover}
+                textColor={isCurrent ? '#000000' : C.textPrimary}
+                contentStyle={styles.btnPadding}
+                onPress={() => goToHouse(item.tokenMint)}
+              >
+                View
+              </Button>
             </View>
             <View style={styles.statsRow}>
-              <Text variant="bodySmall" style={styles.dim}>
-                {item.marketCapUsd !== undefined
-                  ? `Market Cap ${formatUsdCompact(item.marketCapUsd)}`
-                  : 'Market Cap —'}
-              </Text>
+              <View style={styles.statsInline}>
+                <FontAwesome6 name="dollar-sign" size={11} color={C.textSecondary} />
+                <Text variant="bodySmall" style={styles.dim}>
+                  {item.marketCapUsd !== undefined ? formatUsdCompact(item.marketCapUsd) : '—'}
+                </Text>
+              </View>
               <Text variant="bodySmall" style={styles.dim}>
                 ·
               </Text>
@@ -178,7 +151,7 @@ export function HousesScreen() {
         </Card>
       )
     },
-    [currentFounder, busyMint, selectedAccount, inAGuild, onJoin, onLeave, goToHouse],
+    [currentFounder, goToHouse],
   )
 
   if (!selectedAccount) {
@@ -214,6 +187,7 @@ export function HousesScreen() {
         </HelperText>
       ) : null}
 
+      <Fade key={tab} style={styles.flex1}>
       {tab === 'houses' ? (
         <FlatList
           data={filteredGuilds}
@@ -224,11 +198,7 @@ export function HousesScreen() {
             <>
               {currentRow ? (
                 <TouchableRipple onPress={() => goToHouse(currentRow.tokenMint)} style={styles.highlightTouch}>
-                  <CurrentHouseHighlight
-                    row={currentRow}
-                    busy={busyMint === currentRow.tokenMint}
-                    onLeave={() => onLeave(currentRow)}
-                  />
+                  <CurrentHouseHighlight row={currentRow} />
                 </TouchableRipple>
               ) : null}
               {topHouses.length > 0 ? (
@@ -247,6 +217,7 @@ export function HousesScreen() {
                 value={search}
                 onChangeText={setSearch}
                 style={styles.searchInput}
+                outlineStyle={styles.searchOutline}
                 left={
                   <TextInput.Icon
                     icon={() => <FontAwesome6 name="magnifying-glass" size={14} color={C.textSecondary} />}
@@ -268,52 +239,48 @@ export function HousesScreen() {
       ) : (
         <AddHouseTab guilds={guilds} onAdd={addManualRow} />
       )}
+      </Fade>
     </View>
   )
 }
 
-// Your active House — yellow highlight, same content as the web app's own
-// CurrentGuildHighlight (GuildsPage.tsx): token badge, crown + "Your house",
-// fees earned + member count, Leave. Tapping anywhere else on the card opens
-// the House detail screen (see the TouchableRipple wrapper at the call site).
-function CurrentHouseHighlight({
-  row,
-  busy,
-  onLeave,
-}: {
-  row: GuildRow
-  busy: boolean
-  onLeave: () => void
-}) {
+// Your active House — full-width banner + all the same info the web app's
+// own CurrentGuildHighlight (GuildsPage.tsx) shows (token badge, crown +
+// "Your house", fees earned + member count) — no Leave button any more,
+// that action now lives only inside the House detail screen (tapping
+// anywhere on this card opens it, see the TouchableRipple at the call site).
+function CurrentHouseHighlight({ row }: { row: GuildRow }) {
   return (
     <View style={styles.highlight}>
-      <View style={styles.highlightBadge}>
-        <TokenIcon option={{ key: row.tokenMint, symbol: row.symbol || 'H', mint: row.tokenMint }} size={18} />
-        <Text style={styles.highlightSymbol}>{row.symbol || shortAddr(row.tokenMint)}</Text>
+      <BannerImage mint={row.tokenMint} url={dexscreenerBannerUrl(row.tokenMint)} height={110} />
+      <View style={styles.highlightBody}>
+        <View style={styles.highlightTopRow}>
+          <View style={styles.highlightBadge}>
+            <TokenIcon
+              option={{ key: row.tokenMint, symbol: row.symbol || 'H', mint: row.tokenMint }}
+              size={18}
+            />
+            <Text style={styles.highlightSymbol}>{row.symbol || shortAddr(row.tokenMint)}</Text>
+          </View>
+          <View style={styles.highlightHouseRow}>
+            <FontAwesome6 name="crown" size={11} color={C.accentTextOn} />
+            <Text style={styles.highlightHouseText}>Your house</Text>
+          </View>
+        </View>
+        <View style={styles.highlightStatsRow}>
+          <View style={styles.statsInline}>
+            <FontAwesome6 name="dollar-sign" size={11} color={C.accentTextOn} />
+            <Text style={styles.highlightFee}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
+          </View>
+          <Text style={styles.highlightDot}>·</Text>
+          <View style={styles.statsInline}>
+            <FontAwesome6 name="users" size={11} color={C.accentTextOn} />
+            <Text style={styles.highlightMembers}>
+              {row.memberCount} member{row.memberCount === 1 ? '' : 's'}
+            </Text>
+          </View>
+        </View>
       </View>
-      <View style={styles.highlightHouseRow}>
-        <FontAwesome6 name="crown" size={11} color={C.accentTextOn} />
-        <Text style={styles.highlightHouseText}>Your house</Text>
-      </View>
-      <View style={styles.highlightSpacer} />
-      <View style={styles.highlightFeeBlock}>
-        <Text style={styles.highlightFee}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
-        <Text style={styles.highlightMembers}>
-          {row.memberCount} member{row.memberCount === 1 ? '' : 's'}
-        </Text>
-      </View>
-      <Button
-        mode="contained"
-        buttonColor={C.bg}
-        textColor={C.textPrimary}
-        contentStyle={styles.btnPadding}
-        compact
-        loading={busy}
-        disabled={busy}
-        onPress={onLeave}
-      >
-        Leave
-      </Button>
     </View>
   )
 }
@@ -336,9 +303,12 @@ function TopHouseCard({ row, onPress }: { row: GuildRow; onPress: () => void }) 
               {row.symbol || shortAddr(row.tokenMint)}
             </Text>
           </View>
-          <Text variant="labelSmall" numberOfLines={1} style={styles.dim}>
-            {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
-          </Text>
+          <View style={styles.statsInline}>
+            <FontAwesome6 name="dollar-sign" size={9} color={C.textSecondary} />
+            <Text variant="labelSmall" numberOfLines={1} style={styles.dim}>
+              {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
+            </Text>
+          </View>
           <View style={styles.statsInline}>
             <FontAwesome6 name="users" size={9} color={C.textSecondary} />
             <Text variant="labelSmall" style={styles.dim}>
@@ -472,13 +442,17 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   statsInline: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 
-  highlightTouch: { borderRadius: 20, marginBottom: 12 },
+  highlightTouch: { borderRadius: 20, marginBottom: 12, overflow: 'hidden' },
   highlight: {
     backgroundColor: C.accent,
     borderRadius: 20,
-    padding: 14,
+    overflow: 'hidden',
+  },
+  highlightBody: { padding: 14, gap: 8 },
+  highlightTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 10,
     flexWrap: 'wrap',
   },
@@ -494,18 +468,16 @@ const styles = StyleSheet.create({
   highlightSymbol: { color: '#fff', fontWeight: '700' },
   highlightHouseRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   highlightHouseText: { color: C.accentTextOn, fontSize: 12, fontWeight: '600' },
-  highlightSpacer: { flex: 1 },
-  highlightFeeBlock: { alignItems: 'flex-end' },
-  highlightFee: { color: C.accentTextOn, fontWeight: '700', fontSize: 16 },
-  highlightMembers: { color: 'rgba(0,0,0,0.6)', fontSize: 11 },
+  highlightStatsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  highlightDot: { color: C.accentTextOn, opacity: 0.7 },
+  highlightFee: { color: C.accentTextOn, fontWeight: '700', fontSize: 14 },
+  highlightMembers: { color: C.accentTextOn, fontSize: 12 },
 
   topRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
   topCard: {
     flex: 1,
     backgroundColor: C.bgElevated,
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: C.border,
     overflow: 'hidden',
   },
   topCardBody: { padding: 8, gap: 3 },
@@ -513,6 +485,7 @@ const styles = StyleSheet.create({
   topCardSymbol: { color: C.textPrimary, fontWeight: '700', flexShrink: 1 },
 
   searchInput: { backgroundColor: 'transparent', marginBottom: 12 },
+  searchOutline: { borderRadius: 16 },
 
   addCard: { backgroundColor: C.bgElevated, borderRadius: 16, padding: 16 },
   addTitle: { color: C.textPrimary, marginBottom: 10 },
