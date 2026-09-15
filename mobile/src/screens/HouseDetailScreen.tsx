@@ -1,0 +1,200 @@
+import React, { useLayoutEffect, useMemo } from 'react'
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, View } from 'react-native'
+import { Button, Text, TouchableRipple } from 'react-native-paper'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+
+import type { RootStackParamList } from '../navigators/AppNavigator'
+import { useGuildMembership } from '../swapkings/useGuildMembership'
+import { useGuildFeeHistory } from '../swapkings/guildFeeHistory'
+import { GUILD_MARKET_CAP_FLOOR_USD } from '../swapkings/pumpfun'
+import { formatUsdCompact, shortAddr, solscanTxUrl } from '../swapkings/format'
+import { dexscreenerBannerUrl } from '../swapkings/jupiterInfo'
+import { TokenIcon } from '../components/TokenPill'
+import { BannerImage } from '../components/BannerImage'
+import { SWAPKINGS_COLORS as C } from '../theme'
+
+type Props = NativeStackScreenProps<RootStackParamList, 'HouseDetail'>
+
+export function HouseDetailScreen({ route, navigation }: Props) {
+  const { tokenMint } = route.params
+  const {
+    guilds,
+    selectedAccount,
+    currentFounder,
+    inAGuild,
+    onJoin,
+    onLeave,
+    busyMint,
+    err,
+  } = useGuildMembership()
+
+  const row = guilds.find((g) => g.tokenMint === tokenMint) ?? null
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ title: row?.symbol || shortAddr(tokenMint) })
+  }, [navigation, row?.symbol, tokenMint])
+
+  // Always relevant once a mint is open — the hook's own param only gates
+  // "is there any founder wallet in the whole app worth asking the cache
+  // for", which is trivially true here.
+  const { rows: allFeeRows, loading: feesLoading } = useGuildFeeHistory(1)
+  const feeRows = useMemo(
+    () => (row ? allFeeRows.filter((r) => r.founderWallet === row.founderWallet) : []),
+    [allFeeRows, row],
+  )
+
+  if (!row) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+      </View>
+    )
+  }
+
+  const isCurrent = row.founderWallet === currentFounder
+  const busy = busyMint === row.tokenMint
+  const belowFloor = row.marketCapUsd !== undefined && row.marketCapUsd < GUILD_MARKET_CAP_FLOOR_USD
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <BannerImage mint={row.tokenMint} url={dexscreenerBannerUrl(row.tokenMint)} height={160} />
+
+      <View style={styles.body}>
+        <View style={styles.titleRow}>
+          <TokenIcon
+            option={{ key: row.tokenMint, symbol: row.symbol || 'H', mint: row.tokenMint }}
+            size={28}
+          />
+          <Text variant="titleLarge" style={styles.title}>
+            {row.symbol || shortAddr(row.tokenMint)}
+          </Text>
+        </View>
+
+        {isCurrent ? (
+          <Button
+            mode="contained"
+            buttonColor={C.bg}
+            textColor={C.textPrimary}
+            style={styles.bigButton}
+            contentStyle={styles.bigButtonContent}
+            loading={busy}
+            disabled={busy || !selectedAccount}
+            onPress={() => onLeave(row)}
+          >
+            Leave
+          </Button>
+        ) : (
+          <Button
+            mode="contained"
+            buttonColor={C.accent}
+            textColor={C.accentTextOn}
+            style={styles.bigButton}
+            contentStyle={styles.bigButtonContent}
+            loading={busy}
+            disabled={busy || belowFloor || !selectedAccount}
+            onPress={() => onJoin(row)}
+          >
+            {inAGuild ? 'Switch to this House' : 'Join House'}
+          </Button>
+        )}
+
+        <View style={styles.statsCard}>
+          <View style={styles.statBlock}>
+            <FontAwesome6 name="users" size={14} color={C.textSecondary} />
+            <Text style={styles.statValue}>{row.memberCount}</Text>
+            <Text style={styles.statLabel}>Members</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBlock}>
+            <FontAwesome6 name="chart-line" size={14} color={C.textSecondary} />
+            <Text style={styles.statValue}>
+              {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
+            </Text>
+            <Text style={styles.statLabel}>Market Cap</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBlock}>
+            <FontAwesome6 name="hand-holding-dollar" size={14} color={C.textSecondary} />
+            <Text style={styles.statValue}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
+            <Text style={styles.statLabel}>Fees earned</Text>
+          </View>
+        </View>
+
+        {err ? <Text style={styles.errorText}>{err}</Text> : null}
+
+        <Text variant="titleMedium" style={styles.sectionTitle}>
+          Recent fees
+        </Text>
+        {feesLoading && feeRows.length === 0 ? (
+          <ActivityIndicator style={styles.loading} />
+        ) : feeRows.length === 0 ? (
+          <Text style={styles.dim}>No house-fee transactions yet.</Text>
+        ) : (
+          feeRows.map((r) => (
+            <TouchableRipple
+              key={r.signature}
+              style={styles.feeRow}
+              onPress={() => Linking.openURL(solscanTxUrl(r.signature))}
+            >
+              <>
+                <View style={styles.feeTxRow}>
+                  <Text variant="bodySmall" style={styles.feeTx}>
+                    {shortAddr(r.signature)}
+                  </Text>
+                  <FontAwesome6 name="arrow-up-right-from-square" size={10} color={C.textSecondary} />
+                </View>
+                <View style={styles.feeAmountRow}>
+                  <TokenIcon option={{ key: r.mint, symbol: 'T', mint: r.mint }} size={14} />
+                  <Text style={styles.feeAmount}>{formatUsdCompact(r.usdAmount)}</Text>
+                </View>
+              </>
+            </TouchableRipple>
+          ))
+        )}
+      </View>
+    </ScrollView>
+  )
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: C.bg },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  content: { paddingBottom: 32 },
+  body: { padding: 16 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
+  title: { color: C.textPrimary },
+  bigButton: { borderRadius: 14, marginBottom: 16 },
+  bigButtonContent: { height: 48 },
+  statsCard: {
+    flexDirection: 'row',
+    backgroundColor: C.bgElevated,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: C.border,
+    paddingVertical: 14,
+    marginBottom: 20,
+  },
+  statBlock: { flex: 1, alignItems: 'center', gap: 4 },
+  statDivider: { width: 1, backgroundColor: C.border },
+  statValue: { color: C.textPrimary, fontWeight: '700', fontSize: 15 },
+  statLabel: { color: C.textSecondary, fontSize: 11 },
+  errorText: { color: C.negative, marginBottom: 12 },
+  sectionTitle: { color: C.textPrimary, marginBottom: 10 },
+  loading: { marginTop: 16 },
+  dim: { color: C.textSecondary, opacity: 0.7 },
+  feeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: C.bgElevated,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  feeTxRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  feeTx: { color: C.textSecondary },
+  feeAmountRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  feeAmount: { color: C.positive, fontWeight: '700' },
+})

@@ -22,9 +22,10 @@ import { StatusBar } from "expo-status-bar";
  *
  */
 
-type RootStackParamList = {
-  Home: undefined;
+export type RootStackParamList = {
+  HomeStack: undefined;
   Settings: undefined;
+  HouseDetail: { tokenMint: string };
   // 🔥 Your screens go here
 };
 
@@ -35,17 +36,18 @@ declare global {
 }
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator initialRouteName={"Home"}>
+    <Stack.Navigator initialRouteName={"HomeStack"}>
       <Stack.Screen
         name="HomeStack"
         component={HomeNavigator}
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
+      <Stack.Screen name="HouseDetail" component={Screens.HouseDetailScreen} />
       {/** 🔥 Your screens go here */}
     </Stack.Navigator>
   );

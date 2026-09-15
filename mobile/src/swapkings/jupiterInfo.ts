@@ -25,6 +25,12 @@ export function dexscreenerIconUrl(mint: string): string {
   return `https://dd.dexscreener.com/ds-data/tokens/solana/${mint}.png?size=lg`
 }
 
+// Same CDN, same reliability, for the wide banner/header image shown on a
+// token's DexScreener page — used for the Houses screen's top-fee-earners row.
+export function dexscreenerBannerUrl(mint: string): string {
+  return `https://dd.dexscreener.com/ds-data/tokens/solana/${mint}/header.png`
+}
+
 export async function getTokenInfos(mints: string[]): Promise<Record<string, TokenInfo>> {
   if (mints.length === 0) return {}
   const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${mints.join(',')}`)

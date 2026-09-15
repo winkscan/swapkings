@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { FlatList, Linking, ScrollView, StyleSheet, View } from 'react-native'
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native'
 import {
   ActivityIndicator,
   Button,
@@ -12,45 +12,54 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import { PublicKey } from '@solana/web3.js'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
-import { useConnection } from '../utils/ConnectionProvider'
-import { useAuthorization } from '../utils/useAuthorization'
+import type { RootStackParamList } from '../navigators/AppNavigator'
 import { useMobileWallet } from '../utils/useMobileWallet'
-import { useGuilds, type GuildRow } from '../swapkings/useGuilds'
-import { useRank } from '../swapkings/useRank'
-import { useTxRunner } from '../swapkings/txRunner'
-import { useGuildFeeHistory } from '../swapkings/guildFeeHistory'
-import { buildJoinGuildIxs, buildLeaveGuildIx } from '../swapkings/guildActions'
+import { type GuildRow } from '../swapkings/useGuilds'
+import { useGuildMembership } from '../swapkings/useGuildMembership'
 import { GUILD_MARKET_CAP_FLOOR_USD, getPumpFunTokenInfo } from '../swapkings/pumpfun'
-import { getTokenInfos } from '../swapkings/jupiterInfo'
-import { guildPda as deriveGuildPda, ZERO_PUBKEY } from '../swapkings/pdas'
-import { formatUsdCompact, shortAddr, solscanTxUrl } from '../swapkings/format'
-import { friendlyErrorMessage } from '../swapkings/walletErrors'
+import { dexscreenerBannerUrl } from '../swapkings/jupiterInfo'
+import { formatUsdCompact, shortAddr } from '../swapkings/format'
 import { TokenIcon } from '../components/TokenPill'
+import { BannerImage } from '../components/BannerImage'
 import { PillTabs } from '../components/PillTabs'
 import { SWAPKINGS_COLORS as C } from '../theme'
-
-// Jupiter's token-search endpoint is a single GET with a comma-joined
-// `query` — fine for a handful of mints, untested (and risky to trust) once
-// the discovery list runs into the dozens, so icon lookups are chunked
-// rather than one giant request.
-const ICON_BATCH_SIZE = 30
 
 // Client-side-only extra rows a wallet pasted in via the Add House tab (see
 // AddTokenForm on web) — mirrors app/src/pages/GuildsPage.tsx's own
 // localStorage-backed MANUAL_ROWS_KEY, just AsyncStorage instead.
 const MANUAL_ROWS_KEY = 'swapkings.manualGuildRows.v1'
 
-type Tab = 'houses' | 'fees' | 'add'
+const TOP_HOUSES_COUNT = 3
+
+type Tab = 'houses' | 'add'
 
 export function HousesScreen() {
   const [tab, setTab] = useState<Tab>('houses')
-  const { connection } = useConnection()
-  const { selectedAccount } = useAuthorization()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { connect } = useMobileWallet()
-  const runTx = useTxRunner()
-  const { guilds: discoveredGuilds, loading, refresh, applyMembershipDelta } = useGuilds()
-  const rank = useRank()
+  const {
+    guilds: discoveredGuilds,
+    loading,
+    refresh,
+    selectedAccount,
+    currentFounder,
+    currentRow,
+    inAGuild,
+    onJoin,
+    onLeave,
+    busyMint,
+    err,
+  } = useGuildMembership()
+
+  const goToHouse = useCallback(
+    (tokenMint: string) => {
+      navigation.navigate('HouseDetail', { tokenMint })
+    },
+    [navigation],
+  )
 
   const [manualRows, setManualRows] = useState<GuildRow[]>([])
   useEffect(() => {
@@ -73,110 +82,17 @@ export function HousesScreen() {
     return [...discoveredGuilds, ...manualRows.filter((m) => !known.has(m.tokenMint))]
   }, [discoveredGuilds, manualRows])
 
-  const [icons, setIcons] = useState<Record<string, string>>({})
-  useEffect(() => {
-    if (guilds.length === 0) return
-    const mints = guilds.map((g) => g.tokenMint)
-    let cancelled = false
-    for (let i = 0; i < mints.length; i += ICON_BATCH_SIZE) {
-      const batch = mints.slice(i, i + ICON_BATCH_SIZE)
-      getTokenInfos(batch)
-        .then((infos) => {
-          if (cancelled) return
-          const next: Record<string, string> = {}
-          for (const [mint, info] of Object.entries(infos)) if (info.icon) next[mint] = info.icon
-          setIcons((prev) => ({ ...prev, ...next }))
-        })
-        .catch(() => {})
-    }
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [guilds.length])
+  const [search, setSearch] = useState('')
+  const filteredGuilds = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return guilds
+    return guilds.filter(
+      (g) => g.symbol.toLowerCase().includes(q) || g.tokenMint.toLowerCase().includes(q),
+    )
+  }, [guilds, search])
 
-  const [busyMint, setBusyMint] = useState<string | null>(null)
-  const [err, setErr] = useState<string | null>(null)
-
-  const currentFounder = rank.stats.currentGuildFounderWallet.equals(ZERO_PUBKEY)
-    ? null
-    : rank.stats.currentGuildFounderWallet.toBase58()
-  const currentRow = useMemo(
-    () => guilds.find((g) => g.founderWallet === currentFounder) ?? null,
-    [guilds, currentFounder],
-  )
-  const inAGuild = !rank.stats.currentGuild.equals(ZERO_PUBKEY)
-
-  const onJoin = useCallback(
-    async (row: GuildRow) => {
-      if (!selectedAccount) return
-      setBusyMint(row.tokenMint)
-      setErr(null)
-      try {
-        const switchingFrom = currentRow
-        const newGuildPda = row.guildPda || deriveGuildPda(new PublicKey(row.tokenMint)).toBase58()
-        const ixs = await buildJoinGuildIxs({
-          connection,
-          walletPublicKey: selectedAccount.publicKey,
-          tokenMint: new PublicKey(row.tokenMint),
-          founderWallet: new PublicKey(row.founderWallet),
-          previousGuild: inAGuild ? rank.stats.currentGuild : null,
-          isNewGuild: row.guildPda === '',
-        })
-        await runTx(ixs)
-        applyMembershipDelta(row.tokenMint, row.founderWallet, 1, newGuildPda)
-        if (switchingFrom && switchingFrom.tokenMint !== row.tokenMint) {
-          applyMembershipDelta(
-            switchingFrom.tokenMint,
-            switchingFrom.founderWallet,
-            -1,
-            switchingFrom.guildPda,
-          )
-        }
-        refresh()
-        rank.refresh()
-      } catch (e) {
-        setErr(friendlyErrorMessage(e))
-      } finally {
-        setBusyMint(null)
-      }
-    },
-    [selectedAccount, connection, currentRow, inAGuild, rank, runTx, applyMembershipDelta, refresh],
-  )
-
-  const onLeave = useCallback(
-    async (row: GuildRow) => {
-      if (!selectedAccount) return
-      setBusyMint(row.tokenMint)
-      setErr(null)
-      try {
-        const guild = row.guildPda
-          ? new PublicKey(row.guildPda)
-          : deriveGuildPda(new PublicKey(row.tokenMint))
-        const ix = await buildLeaveGuildIx({
-          connection,
-          walletPublicKey: selectedAccount.publicKey,
-          guild,
-        })
-        await runTx(ix)
-        applyMembershipDelta(row.tokenMint, row.founderWallet, -1, guild.toBase58())
-        refresh()
-        rank.refresh()
-      } catch (e) {
-        setErr(friendlyErrorMessage(e))
-      } finally {
-        setBusyMint(null)
-      }
-    },
-    [selectedAccount, connection, rank, runTx, applyMembershipDelta, refresh],
-  )
-
-  const founderWallets = useMemo(
-    () => new Set(guilds.filter((g) => g.guildPda).map((g) => g.founderWallet)),
-    [guilds],
-  )
-  const founderWalletToHouseMint = useMemo(
-    () => new Map(guilds.filter((g) => g.guildPda).map((g) => [g.founderWallet, g.tokenMint])),
+  const topHouses = useMemo(
+    () => [...guilds].sort((a, b) => b.totalFeesEarnedUsd - a.totalFeesEarnedUsd).slice(0, TOP_HOUSES_COUNT),
     [guilds],
   )
 
@@ -187,17 +103,12 @@ export function HousesScreen() {
         item.marketCapUsd !== undefined && item.marketCapUsd < GUILD_MARKET_CAP_FLOOR_USD
       const busy = busyMint === item.tokenMint
       return (
-        <Card style={styles.row}>
+        <Card style={styles.row} onPress={() => goToHouse(item.tokenMint)}>
           <Card.Content>
             <View style={styles.rowTop}>
               <View style={styles.rowTitle}>
                 <TokenIcon
-                  option={{
-                    key: item.tokenMint,
-                    symbol: item.symbol || 'H',
-                    icon: icons[item.tokenMint],
-                    mint: item.tokenMint,
-                  }}
+                  option={{ key: item.tokenMint, symbol: item.symbol || 'H', mint: item.tokenMint }}
                   size={22}
                 />
                 <Text variant="titleMedium" style={styles.flex1}>
@@ -267,7 +178,7 @@ export function HousesScreen() {
         </Card>
       )
     },
-    [currentFounder, busyMint, selectedAccount, inAGuild, onJoin, onLeave, icons],
+    [currentFounder, busyMint, selectedAccount, inAGuild, onJoin, onLeave, goToHouse],
   )
 
   if (!selectedAccount) {
@@ -291,7 +202,6 @@ export function HousesScreen() {
           onChange={setTab}
           options={[
             { value: 'houses', label: 'Houses' },
-            { value: 'fees', label: 'Fees sent' },
             { value: 'add', label: 'Add House' },
           ]}
           fullWidth
@@ -306,19 +216,44 @@ export function HousesScreen() {
 
       {tab === 'houses' ? (
         <FlatList
-          data={guilds}
+          data={filteredGuilds}
           keyExtractor={(g) => g.tokenMint}
           renderItem={renderRow}
           contentContainerStyle={styles.list}
           ListHeaderComponent={
-            currentRow ? (
-              <CurrentHouseHighlight
-                row={currentRow}
-                icon={icons[currentRow.tokenMint]}
-                busy={busyMint === currentRow.tokenMint}
-                onLeave={() => onLeave(currentRow)}
+            <>
+              {currentRow ? (
+                <TouchableRipple onPress={() => goToHouse(currentRow.tokenMint)} style={styles.highlightTouch}>
+                  <CurrentHouseHighlight
+                    row={currentRow}
+                    busy={busyMint === currentRow.tokenMint}
+                    onLeave={() => onLeave(currentRow)}
+                  />
+                </TouchableRipple>
+              ) : null}
+              {topHouses.length > 0 ? (
+                <View style={styles.topRow}>
+                  {topHouses.map((h) => (
+                    <TopHouseCard key={h.tokenMint} row={h} onPress={() => goToHouse(h.tokenMint)} />
+                  ))}
+                </View>
+              ) : null}
+              <TextInput
+                mode="outlined"
+                dense
+                placeholder="Search your house"
+                autoCapitalize="none"
+                autoCorrect={false}
+                value={search}
+                onChangeText={setSearch}
+                style={styles.searchInput}
+                left={
+                  <TextInput.Icon
+                    icon={() => <FontAwesome6 name="magnifying-glass" size={14} color={C.textSecondary} />}
+                  />
+                }
               />
-            ) : null
+            </>
           }
           ListEmptyComponent={
             loading ? (
@@ -330,11 +265,6 @@ export function HousesScreen() {
           onRefresh={refresh}
           refreshing={loading}
         />
-      ) : tab === 'fees' ? (
-        <FeesSentTab
-          founderWalletsSize={founderWallets.size}
-          founderWalletToHouseMint={founderWalletToHouseMint}
-        />
       ) : (
         <AddHouseTab guilds={guilds} onAdd={addManualRow} />
       )}
@@ -344,25 +274,21 @@ export function HousesScreen() {
 
 // Your active House — yellow highlight, same content as the web app's own
 // CurrentGuildHighlight (GuildsPage.tsx): token badge, crown + "Your house",
-// fees earned + member count, Leave.
+// fees earned + member count, Leave. Tapping anywhere else on the card opens
+// the House detail screen (see the TouchableRipple wrapper at the call site).
 function CurrentHouseHighlight({
   row,
-  icon,
   busy,
   onLeave,
 }: {
   row: GuildRow
-  icon?: string
   busy: boolean
   onLeave: () => void
 }) {
   return (
     <View style={styles.highlight}>
       <View style={styles.highlightBadge}>
-        <TokenIcon
-          option={{ key: row.tokenMint, symbol: row.symbol || 'H', icon, mint: row.tokenMint }}
-          size={18}
-        />
+        <TokenIcon option={{ key: row.tokenMint, symbol: row.symbol || 'H', mint: row.tokenMint }} size={18} />
         <Text style={styles.highlightSymbol}>{row.symbol || shortAddr(row.tokenMint)}</Text>
       </View>
       <View style={styles.highlightHouseRow}>
@@ -392,87 +318,43 @@ function CurrentHouseHighlight({
   )
 }
 
-// Recent house-fee payouts — same content as FeesEarnedTab on web.
-function FeesSentTab({
-  founderWalletsSize,
-  founderWalletToHouseMint,
-}: {
-  founderWalletsSize: number
-  founderWalletToHouseMint: Map<string, string>
-}) {
-  const { rows, loading, error } = useGuildFeeHistory(founderWalletsSize)
-
-  // Own icon set, not the Houses tab's — a fee can be paid in a currency
-  // (SOL/USDC/etc) that never appears in the Houses list at all, and a
-  // payout's house might not be in the CURRENT discovery/manual list either
-  // (an older founder wallet). Fetching from the rows actually shown here is
-  // the only way both the house badge and the fee-currency badge reliably
-  // resolve to a real icon instead of the yellow-circle+letter fallback.
-  const [icons, setIcons] = useState<Record<string, string>>({})
-  useEffect(() => {
-    if (rows.length === 0) return
-    const mints = [
-      ...new Set(
-        rows.flatMap((r) => [founderWalletToHouseMint.get(r.founderWallet) ?? r.mint, r.mint]),
-      ),
-    ]
-    getTokenInfos(mints)
-      .then((infos) => {
-        const next: Record<string, string> = {}
-        for (const [mint, info] of Object.entries(infos)) if (info.icon) next[mint] = info.icon
-        setIcons((prev) => ({ ...prev, ...next }))
-      })
-      .catch(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows.length])
-
+// Top 3 Houses by fees earned — banner image + the same info as a regular
+// list row, minus the Join/Switch/Leave button (tapping the card itself
+// opens the House, where that action lives now).
+function TopHouseCard({ row, onPress }: { row: GuildRow; onPress: () => void }) {
   return (
-    <ScrollView contentContainerStyle={[styles.list, styles.feesListTop]}>
-      {loading && rows.length === 0 ? <ActivityIndicator style={styles.loading} /> : null}
-      {error ? (
-        <Text style={[styles.loading, styles.errorText]}>Couldn&apos;t load history: {error}</Text>
-      ) : null}
-      {!loading && !error && rows.length === 0 ? (
-        <Text style={styles.loading}>No house-fee transactions yet.</Text>
-      ) : null}
-      {rows.map((row) => {
-        const houseMint = founderWalletToHouseMint.get(row.founderWallet) ?? row.mint
-        return (
-          <Card key={row.signature} style={styles.row}>
-            <Card.Content style={styles.feeRow}>
-              <View style={styles.feeRowLeft}>
-                <TokenIcon
-                  option={{ key: houseMint, symbol: 'H', icon: icons[houseMint], mint: houseMint }}
-                  size={22}
-                />
-              </View>
-              <TouchableRipple
-                style={styles.feeTxRow}
-                onPress={() => Linking.openURL(solscanTxUrl(row.signature))}
-              >
-                <>
-                  <Text variant="bodySmall" style={styles.feeTx}>
-                    {shortAddr(row.signature)}
-                  </Text>
-                  <FontAwesome6 name="arrow-up-right-from-square" size={10} color={C.textSecondary} />
-                </>
-              </TouchableRipple>
-              <View style={styles.feeAmountRow}>
-                <TokenIcon
-                  option={{ key: row.mint, symbol: 'T', icon: icons[row.mint], mint: row.mint }}
-                  size={14}
-                />
-                <Text style={styles.feeAmount}>{formatUsdCompact(row.usdAmount)}</Text>
-              </View>
-            </Card.Content>
-          </Card>
-        )
-      })}
-
-      <Text variant="bodySmall" style={styles.feesNote}>
-        Most recent house-fee payouts, newest first.
-      </Text>
-    </ScrollView>
+    <TouchableRipple style={styles.topCard} onPress={onPress}>
+      <View>
+        <BannerImage mint={row.tokenMint} url={dexscreenerBannerUrl(row.tokenMint)} height={56} />
+        <View style={styles.topCardBody}>
+          <View style={styles.topCardTitleRow}>
+            <TokenIcon
+              option={{ key: row.tokenMint, symbol: row.symbol || 'H', mint: row.tokenMint }}
+              size={16}
+            />
+            <Text variant="labelMedium" numberOfLines={1} style={styles.topCardSymbol}>
+              {row.symbol || shortAddr(row.tokenMint)}
+            </Text>
+          </View>
+          <Text variant="labelSmall" numberOfLines={1} style={styles.dim}>
+            {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
+          </Text>
+          <View style={styles.statsInline}>
+            <FontAwesome6 name="users" size={9} color={C.textSecondary} />
+            <Text variant="labelSmall" style={styles.dim}>
+              {row.memberCount}
+            </Text>
+            <Text variant="labelSmall" style={styles.dim}>
+              ·
+            </Text>
+            <FontAwesome6 name="hand-holding-dollar" size={9} color={C.textSecondary} />
+            <Text variant="labelSmall" style={styles.dim}>
+              {formatUsdCompact(row.totalFeesEarnedUsd)}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableRipple>
   )
 }
 
@@ -590,6 +472,7 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   statsInline: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 
+  highlightTouch: { borderRadius: 20, marginBottom: 12 },
   highlight: {
     backgroundColor: C.accent,
     borderRadius: 20,
@@ -597,7 +480,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 12,
     flexWrap: 'wrap',
   },
   highlightBadge: {
@@ -617,17 +499,20 @@ const styles = StyleSheet.create({
   highlightFee: { color: C.accentTextOn, fontWeight: '700', fontSize: 16 },
   highlightMembers: { color: 'rgba(0,0,0,0.6)', fontSize: 11 },
 
-  // Note sits below the list now (moved per user request) — top margin, not
-  // bottom.
-  feesNote: { color: C.textSecondary, marginTop: 8, textAlign: 'center' },
-  // +10px on top of `list`'s own top padding.
-  feesListTop: { paddingTop: 10 },
-  feeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  feeRowLeft: { flexShrink: 0 },
-  feeTxRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  feeTx: { color: C.textSecondary },
-  feeAmountRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  feeAmount: { color: C.positive, fontWeight: '700' },
+  topRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  topCard: {
+    flex: 1,
+    backgroundColor: C.bgElevated,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.border,
+    overflow: 'hidden',
+  },
+  topCardBody: { padding: 8, gap: 3 },
+  topCardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  topCardSymbol: { color: C.textPrimary, fontWeight: '700', flexShrink: 1 },
+
+  searchInput: { backgroundColor: 'transparent', marginBottom: 12 },
 
   addCard: { backgroundColor: C.bgElevated, borderRadius: 16, padding: 16 },
   addTitle: { color: C.textPrimary, marginBottom: 10 },
