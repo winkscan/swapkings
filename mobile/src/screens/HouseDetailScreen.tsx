@@ -31,8 +31,20 @@ export function HouseDetailScreen({ route, navigation }: Props) {
 
   const row = guilds.find((g) => g.tokenMint === tokenMint) ?? null
 
+  // Icon + symbol replaces the plain text title next to the back arrow —
+  // the icon+name row that used to repeat right below the banner was
+  // redundant with this and has been dropped (user feedback, 2026-09-15).
   useLayoutEffect(() => {
-    navigation.setOptions({ title: row?.symbol || shortAddr(tokenMint) })
+    navigation.setOptions({
+      headerTitle: () => (
+        <View style={styles.headerTitle}>
+          <TokenIcon option={{ key: tokenMint, symbol: row?.symbol || 'H', mint: tokenMint }} size={22} />
+          <Text variant="titleMedium" style={styles.headerTitleText}>
+            {row?.symbol || shortAddr(tokenMint)}
+          </Text>
+        </View>
+      ),
+    })
   }, [navigation, row?.symbol, tokenMint])
 
   // Always relevant once a mint is open — the hook's own param only gates
@@ -61,16 +73,6 @@ export function HouseDetailScreen({ route, navigation }: Props) {
       <BannerImage mint={row.tokenMint} url={dexscreenerBannerUrl(row.tokenMint)} height={160} />
 
       <View style={styles.body}>
-        <View style={styles.titleRow}>
-          <TokenIcon
-            option={{ key: row.tokenMint, symbol: row.symbol || 'H', mint: row.tokenMint }}
-            size={28}
-          />
-          <Text variant="titleLarge" style={styles.title}>
-            {row.symbol || shortAddr(row.tokenMint)}
-          </Text>
-        </View>
-
         {isCurrent ? (
           <Button
             mode="contained"
@@ -105,15 +107,13 @@ export function HouseDetailScreen({ route, navigation }: Props) {
             <Text style={styles.statValue}>{row.memberCount}</Text>
             <Text style={styles.statLabel}>Members</Text>
           </View>
-          <View style={styles.statDivider} />
           <View style={styles.statBlock}>
-            <FontAwesome6 name="chart-line" size={14} color={C.textSecondary} />
+            <FontAwesome6 name="briefcase" size={14} color={C.textSecondary} />
             <Text style={styles.statValue}>
               {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
             </Text>
             <Text style={styles.statLabel}>Market Cap</Text>
           </View>
-          <View style={styles.statDivider} />
           <View style={styles.statBlock}>
             <FontAwesome6 name="hand-holding-dollar" size={14} color={C.textSecondary} />
             <Text style={styles.statValue}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
@@ -162,21 +162,18 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   content: { paddingBottom: 32 },
   body: { padding: 16 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
-  title: { color: C.textPrimary },
-  bigButton: { borderRadius: 14, marginBottom: 16 },
+  headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerTitleText: { color: C.textPrimary },
+  bigButton: { borderRadius: 14, marginTop: 4, marginBottom: 16 },
   bigButtonContent: { height: 48 },
   statsCard: {
     flexDirection: 'row',
     backgroundColor: C.bgElevated,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: C.border,
     paddingVertical: 14,
     marginBottom: 20,
   },
   statBlock: { flex: 1, alignItems: 'center', gap: 4 },
-  statDivider: { width: 1, backgroundColor: C.border },
   statValue: { color: C.textPrimary, fontWeight: '700', fontSize: 15 },
   statLabel: { color: C.textSecondary, fontSize: 11 },
   errorText: { color: C.negative, marginBottom: 12 },

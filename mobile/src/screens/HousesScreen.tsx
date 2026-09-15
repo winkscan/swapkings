@@ -93,7 +93,7 @@ export function HousesScreen() {
         item.marketCapUsd !== undefined && item.marketCapUsd < GUILD_MARKET_CAP_FLOOR_USD
       return (
         <Card style={styles.row} onPress={() => goToHouse(item.tokenMint)}>
-          <Card.Content>
+          <Card.Content style={styles.rowContent}>
             <View style={styles.rowTop}>
               <View style={styles.rowTitle}>
                 <TokenIcon
@@ -109,7 +109,9 @@ export function HousesScreen() {
                 mode="contained"
                 buttonColor={isCurrent ? '#ffffff' : C.bgHover}
                 textColor={isCurrent ? '#000000' : C.textPrimary}
-                contentStyle={styles.btnPadding}
+                style={styles.viewBtn}
+                contentStyle={styles.viewBtnContent}
+                labelStyle={styles.viewBtnLabel}
                 onPress={() => goToHouse(item.tokenMint)}
               >
                 View
@@ -117,7 +119,7 @@ export function HousesScreen() {
             </View>
             <View style={styles.statsRow}>
               <View style={styles.statsInline}>
-                <FontAwesome6 name="dollar-sign" size={11} color={C.textSecondary} />
+                <FontAwesome6 name="briefcase" size={11} color={C.textSecondary} />
                 <Text variant="bodySmall" style={styles.dim}>
                   {item.marketCapUsd !== undefined ? formatUsdCompact(item.marketCapUsd) : '—'}
                 </Text>
@@ -202,11 +204,16 @@ export function HousesScreen() {
                 </TouchableRipple>
               ) : null}
               {topHouses.length > 0 ? (
-                <View style={styles.topRow}>
-                  {topHouses.map((h) => (
-                    <TopHouseCard key={h.tokenMint} row={h} onPress={() => goToHouse(h.tokenMint)} />
-                  ))}
-                </View>
+                <>
+                  <Text variant="titleLarge" style={styles.topSectionTitle}>
+                    Top 3 Houses
+                  </Text>
+                  <View style={styles.topRow}>
+                    {topHouses.map((h) => (
+                      <TopHouseCard key={h.tokenMint} row={h} onPress={() => goToHouse(h.tokenMint)} />
+                    ))}
+                  </View>
+                </>
               ) : null}
               <TextInput
                 mode="outlined"
@@ -249,6 +256,7 @@ export function HousesScreen() {
 // "Your house", fees earned + member count) — no Leave button any more,
 // that action now lives only inside the House detail screen (tapping
 // anywhere on this card opens it, see the TouchableRipple at the call site).
+// White card now (was solid yellow) per user follow-up, 2026-09-15.
 function CurrentHouseHighlight({ row }: { row: GuildRow }) {
   return (
     <View style={styles.highlight}>
@@ -262,19 +270,15 @@ function CurrentHouseHighlight({ row }: { row: GuildRow }) {
             />
             <Text style={styles.highlightSymbol}>{row.symbol || shortAddr(row.tokenMint)}</Text>
           </View>
+          <Text style={styles.highlightFee}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
+        </View>
+        <View style={styles.highlightBottomRow}>
           <View style={styles.highlightHouseRow}>
-            <FontAwesome6 name="crown" size={11} color={C.accentTextOn} />
+            <FontAwesome6 name="crown" size={11} color="#000000" />
             <Text style={styles.highlightHouseText}>Your house</Text>
           </View>
-        </View>
-        <View style={styles.highlightStatsRow}>
           <View style={styles.statsInline}>
-            <FontAwesome6 name="dollar-sign" size={11} color={C.accentTextOn} />
-            <Text style={styles.highlightFee}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
-          </View>
-          <Text style={styles.highlightDot}>·</Text>
-          <View style={styles.statsInline}>
-            <FontAwesome6 name="users" size={11} color={C.accentTextOn} />
+            <FontAwesome6 name="users" size={11} color={C.textSecondary} />
             <Text style={styles.highlightMembers}>
               {row.memberCount} member{row.memberCount === 1 ? '' : 's'}
             </Text>
@@ -304,7 +308,7 @@ function TopHouseCard({ row, onPress }: { row: GuildRow; onPress: () => void }) 
             </Text>
           </View>
           <View style={styles.statsInline}>
-            <FontAwesome6 name="dollar-sign" size={9} color={C.textSecondary} />
+            <FontAwesome6 name="briefcase" size={9} color={C.textSecondary} />
             <Text variant="labelSmall" numberOfLines={1} style={styles.dim}>
               {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
             </Text>
@@ -430,7 +434,8 @@ const styles = StyleSheet.create({
   // too tight against the content (user feedback, 2026-09-11).
   tabsWrap: { margin: 12, marginBottom: 10 },
   list: { padding: 12 },
-  row: { marginBottom: 10 },
+  row: { marginBottom: 8 },
+  rowContent: { paddingVertical: 10 },
   rowTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rowTitle: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   flex1: { flex: 1 },
@@ -439,41 +444,51 @@ const styles = StyleSheet.create({
   loading: { textAlign: 'center', marginTop: 32, opacity: 0.7 },
   errorText: { color: C.negative },
   btnPadding: { paddingHorizontal: 10 },
+  // Same height as the row's own 22px token icon, so the View button sits
+  // visually level with it instead of towering over it (user feedback,
+  // 2026-09-15) — also lets the whole row/card shrink a bit.
+  viewBtn: { borderRadius: 11 },
+  viewBtnContent: { height: 22, paddingHorizontal: 10 },
+  viewBtnLabel: { fontSize: 11, marginVertical: 0, lineHeight: 13 },
   statsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   statsInline: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 
   highlightTouch: { borderRadius: 20, marginBottom: 12, overflow: 'hidden' },
   highlight: {
-    backgroundColor: C.accent,
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     overflow: 'hidden',
   },
-  highlightBody: { padding: 14, gap: 8 },
+  highlightBody: { padding: 14, gap: 6 },
   highlightTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
-    flexWrap: 'wrap',
   },
   highlightBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
     borderRadius: 16,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
   highlightSymbol: { color: '#fff', fontWeight: '700' },
+  highlightFee: { color: '#000000', fontWeight: '700', fontSize: 22 },
+  highlightBottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
   highlightHouseRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  highlightHouseText: { color: C.accentTextOn, fontSize: 12, fontWeight: '600' },
-  highlightStatsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  highlightDot: { color: C.accentTextOn, opacity: 0.7 },
-  highlightFee: { color: C.accentTextOn, fontWeight: '700', fontSize: 14 },
-  highlightMembers: { color: C.accentTextOn, fontSize: 12 },
+  highlightHouseText: { color: '#000000', fontSize: 12, fontWeight: '600' },
+  highlightMembers: { color: C.textSecondary, fontSize: 12 },
 
-  topRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  topSectionTitle: { color: C.textPrimary, fontWeight: '700', marginBottom: 10 },
+  topRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
   topCard: {
     flex: 1,
     backgroundColor: C.bgElevated,
