@@ -1,0 +1,54 @@
+.anchor
+# Empty, remote-less git repo the Expo scaffold auto-created inside mobile/
+# and never used — moved aside rather than deleted when wiring up the real
+# repo at the project root (2026-09-15).
+mobile/.git.empty.bak
+.DS_Store
+target
+**/*.rs.bk
+node_modules
+test-ledger
+.yarn
+.surfpool
+.wrangler
+
+keys/
+
+# Android signing key (Bubblewrap/TWA) — never commit, this is the ONLY key
+# that can sign updates to the published app under app.swapkings.twa; a leak
+# is as bad as losing it, not just embarrassing.
+android.keystore
+*.keystore
+
+# Build outputs — regenerate via `bubblewrap build` / `expo export` / Gradle,
+# not meant to be version-controlled. Found the Bubblewrap TWA's own
+# app/app/build/ Gradle output (500+ generated files) staged by a plain
+# `git add -A` while prepping the first public push (2026-09-15) — generic
+# build/ and dist/ rules catch that plus mobile's `expo export` output.
+build/
+dist/
+*.apk
+*.apk.idsig
+*.aab
+
+# Gradle's local build cache (checksums/execution history/file hashes) —
+# also caught by the same `git add -A` sweep, machine-local by design.
+.gradle/
+
+# Local env files — not secrets in the classic sense (no API keys live here
+# anymore after the server-side-proxy fix), but still config that shouldn't
+# be forked blindly.
+.env.local
+
+# Local ops-only, machine-specific — hardcodes a live Helius API key and this
+# machine's absolute paths, found while prepping the first public push
+# (2026-09-15). Never commit as-is.
+scripts/run_sweep_cron.sh
+
+# Local run output, not project content.
+logs/
+
+# Outreach/DM campaign notes — internal marketing logs, not part of the
+# submitted project.
+outreach-log.md
+outreach-voting-sites-log.md

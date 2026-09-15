@@ -1,0 +1,48 @@
+[package]
+name = "solana-swap-rewards"
+version = "0.1.0"
+description = "Created with Anchor"
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "solana_swap_rewards"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+
+[dependencies]
+anchor-lang = { version = "1.1.2", features = ["init-if-needed"] }
+anchor-spl = { version = "1.1.2", features = ["associated_token"] }
+solana-sysvar = "4.2.0"
+# join_guild's founder-attestation check (see that file's own comment) needs
+# real ed25519_program instruction introspection — anchor-lang 1.1.2 doesn't
+# re-export either of these itself (confirmed by grepping its own source),
+# so they're pulled in directly at the exact versions Cargo already resolved
+# for them transitively (see Cargo.lock) to avoid a second, divergent copy.
+solana-sdk-ids = "3.1.0"
+solana-instructions-sysvar = "3.0.1"
+
+[dev-dependencies]
+proptest = "1"
+litesvm = "0.10.0"
+litesvm-token = "0.10.0"
+solana-message = "3.0.1"
+solana-transaction = "3.0.2"
+solana-signer = "3.0.0"
+solana-keypair = "3.0.1"
+solana-hash = "3.1.0"
+solana-slot-hashes = "3.0"
+
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

@@ -1,0 +1,410 @@
+:root {
+  /* Jupiter-inspired dark palette */
+  --bg: #090d10;
+  --bg-elevated: #12161c;
+  --bg-input: #171b22;
+  --bg-hover: #1c212a;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text-primary: #f5f6f8;
+  --text-secondary: #8992a6;
+  --text-tertiary: #5b6376;
+
+  --accent: #FFEF46;
+  --accent-hover: #fff573;
+  --accent-text-on: #0b1006;
+
+  --positive: #B5FF46;
+  --negative: #f6685a;
+
+  --radius-pill: 999px;
+  --radius-card: 20px;
+  --radius-input: 14px;
+
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+
+  color-scheme: dark;
+  color: var(--text-primary);
+  background: var(--bg);
+  font-family: var(--font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  /* Stops the rubber-band bounce from revealing the browser's own background
+     past the page edges — small thing, but it's exactly the kind of "you can
+     tell this is a webpage" cue a native app never has. */
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
+  /* Defensive backstop — a plain HTML <table> ignores `width:100%` as a hard
+     cap (table-layout:auto lets column content push it wider than its
+     container), so a wide table anywhere on the site can force page-level
+     horizontal scroll on narrow phones. Found live 2026-08-24 on the Guide
+     page's 5-column fee table at 375-430px width — fixed at the source by
+     wrapping each table in its own overflow-x:auto container (see
+     RulesPage.tsx), but this stays as a hard backstop so the same class of
+     bug can never again produce a full-page horizontal scrollbar, which — on
+     mobile — was also the actual cause of the bottom tab bar not appearing
+     until the first scroll (a `position:fixed` layout quirk tied to the page
+     having horizontal overflow at all).
+  */
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  /* Skips the ~300ms tap-delay browsers otherwise wait to see if a tap turns
+     into a double-tap-to-zoom — one of the more noticeable "this is a website"
+     tells on mobile. */
+  touch-action: manipulation;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-text-on);
+  border: none;
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 16px;
+}
+
+/* :hover is guarded behind (hover: hover) so touch devices never get a stuck
+   hover state after a tap (mobile Safari otherwise applies :hover on touch and
+   only clears it on the next tap elsewhere) — a real cursor is what :hover is
+   for; on a touchscreen it just reads as a UI glitch. */
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    text-decoration: underline;
+  }
+  button:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+  button.primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+  .mobile-tab-bar__item:hover:not(.active) {
+    color: #fff;
+  }
+}
+
+input {
+  font-family: var(--font);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: 12px 14px;
+  font-size: 15px;
+}
+input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.pill-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+}
+.pill-tabs button {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+.pill-tabs button.active {
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  text-align: left;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  padding: 8px 10px;
+}
+td {
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+  font-size: 14px;
+}
+@media (max-width: 480px) {
+  th,
+  td {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-negative {
+  color: var(--negative);
+}
+.text-positive {
+  color: var(--positive);
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* No tab links left in the top bar (see NavBar.tsx) — just the logo and
+   wallet button, so the middle grid track stays pinned to 0 rather than an
+   "auto" track that won't reliably collapse just because nothing renders
+   into it. */
+.nav-grid {
+  display: grid;
+  grid-template-columns: 1fr 0 1fr;
+}
+
+/* Website-style footer (copyright + a text link to Rules) — redundant now
+   that Rules has its own tab in the bottom bar at every width, and a
+   copyright line is exactly the kind of thing a native app never shows. */
+.site-footer {
+  display: none;
+}
+
+/* Primary tab bar — fixed to the bottom edge at every viewport width (see
+   NavBar.tsx's TabBar). Centered and capped at the site's own content width
+   (matches .app's max-width) on wide viewports instead of stretching edge to
+   edge; on narrow viewports 100% already equals the full viewport width, so
+   this collapses to the same edge-to-edge mobile bar as before. */
+.mobile-tab-bar {
+  display: flex;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  max-width: 640px;
+  z-index: 100;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  /* Negative-Y shadow only (no downward spread) so the bar reads as
+     floating just above the page content instead of sitting flush with it. */
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  /* iPhone home-indicator clearance — needs viewport-fit=cover in
+     index.html's <meta name="viewport"> or this resolves to 0. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mobile-tab-bar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+/* These are nav tabs, not text links — override the global a:hover underline
+   (index.css's own `a:hover { text-decoration: underline }`) so hovering a
+   tab doesn't put a line under its label. */
+.mobile-tab-bar__item:hover {
+  text-decoration: none;
+}
+.mobile-tab-bar__item svg {
+  font-size: 18px;
+}
+.mobile-tab-bar__item.active {
+  color: var(--accent);
+}
+.app {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 480px) {
+  .swap-actions {
+    flex-direction: column;
+  }
+}
+
+/* Houses table, mobile: Market cap/Members columns drop out to keep the
+   table from ever needing its own horizontal scroll (see RulesPage's own
+   "table pushes the whole page wider" note — the same underlying HTML
+   table behavior, headed off here by removing columns instead of trying to
+   squeeze all 5 into ~340px). The member count doesn't just disappear
+   though — .guild-row-mobile-members (a small icon+number next to the
+   token's own name, see GuildRowView in GuildsPage.tsx) takes over showing
+   it, hidden here by default so it doesn't double up with the real column
+   on wider screens. */
+.guild-table-optional-col {
+  display: none;
+}
+.guild-row-mobile-members {
+  display: none;
+}
+@media (max-width: 480px) {
+  .guild-row-mobile-members {
+    display: inline-flex;
+  }
+}
+@media (min-width: 481px) {
+  .guild-table-optional-col {
+    display: table-cell;
+  }
+}
+/* Table runs flush with the card's own edges on mobile ("в притык" — every
+   pixel matters once only 4 columns are left) — negative margins exactly
+   cancel .card's own 20px padding, and the auto-width box then fills that
+   reclaimed space on its own (standard bleed technique), so the table
+   itself doesn't need an explicit width. th/td keep their own padding
+   (reduced above) so cell text still isn't glued to the screen edge, just
+   the table's outer box is. */
+@media (max-width: 480px) {
+  .guild-table-bleed {
+    margin-left: -20px;
+    margin-right: -20px;
+  }
+}
+
+/* "Your house" highlight card (GuildsPage's CurrentGuildHighlight) — one row
+   on desktop (token, "Your house" label, fee/members, Leave button all
+   inline), a 2x2 grid on mobile (token+Leave on top, "Your house"+fee/
+   members below) — Alexey's explicit ask 2026-08-25, ≤480px to match every
+   other mobile breakpoint already used on this page. */
+.guild-highlight {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  grid-template-areas: 'token house . fee leave';
+  align-items: center;
+  column-gap: 16px;
+}
+.guild-highlight__token {
+  grid-area: token;
+}
+.guild-highlight__house {
+  grid-area: house;
+}
+.guild-highlight__fee {
+  grid-area: fee;
+}
+.guild-highlight__leave {
+  grid-area: leave;
+}
+@media (max-width: 480px) {
+  .guild-highlight {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'token leave'
+      'house fee';
+    row-gap: 10px;
+    column-gap: 12px;
+  }
+  .guild-highlight__leave,
+  .guild-highlight__fee {
+    justify-self: end;
+  }
+}
+
+.wallet-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.wallet-btn__text {
+  display: none;
+}
+@media (max-width: 480px) {
+  .wallet-btn--disconnected {
+    width: auto;
+    height: auto;
+    border-radius: var(--radius-pill);
+    padding: 10px 20px;
+    gap: 8px;
+  }
+  .wallet-btn--disconnected .wallet-btn__icon {
+    display: none;
+  }
+  .wallet-btn--disconnected .wallet-btn__text {
+    display: inline;
+  }
+}

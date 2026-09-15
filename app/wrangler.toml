@@ -1,0 +1,12 @@
+name = "swapkings"
+compatibility_date = "2026-08-25"
+
+# Pure static SPA — no server-side Worker logic needed, `assets` alone is
+# enough (Cloudflare's newer recommended path over the older Pages product;
+# `wrangler pages deploy` itself told us so — see this session's own notes).
+# not_found_handling routes any non-file path (e.g. /houses, /friends) back
+# to index.html so client-side React Router can take over, instead of a raw
+# 404 on a hard refresh of a deep link.
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"

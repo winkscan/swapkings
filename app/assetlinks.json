@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.swapkings.twa",
+        "sha256_cert_fingerprints": ["7C:3C:1F:57:CC:81:7F:7C:8A:99:46:96:68:88:34:CF:1B:97:9B:BE:10:62:A9:AD:75:29:40:B3:61:72:84:33"]
+      }
+    }]

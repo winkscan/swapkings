@@ -1,0 +1,1678 @@
+{
+  "address": "C84oAsWU1whcVLNz2555DP12fBmE116LAiUYsCdkmwaD",
+  "metadata": {
+    "name": "solana_swap_rewards",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "claim_referral_code",
+      "discriminator": [
+        182,
+        240,
+        222,
+        92,
+        161,
+        217,
+        184,
+        228
+      ],
+      "accounts": [
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "referral_code",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  102,
+                  95,
+                  99,
+                  111,
+                  100,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "code"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "code",
+          "type": {
+            "array": [
+              "u8",
+              7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "increment",
+      "discriminator": [
+        11,
+        18,
+        104,
+        9,
+        104,
+        174,
+        59,
+        33
+      ],
+      "accounts": [
+        {
+          "name": "counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "join_guild",
+      "discriminator": [
+        242,
+        159,
+        183,
+        21,
+        140,
+        65,
+        110,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "guild",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  117,
+                  105,
+                  108,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "previous_guild",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "instructions_sysvar",
+          "docs": [
+            "attestation instruction — pinned to the real Instructions sysvar",
+            "address, never any other account."
+          ],
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "founder_wallet",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "leave_guild",
+      "discriminator": [
+        32,
+        129,
+        72,
+        117,
+        154,
+        8,
+        115,
+        245
+      ],
+      "accounts": [
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "guild",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "migrate_player_stats",
+      "discriminator": [
+        96,
+        209,
+        44,
+        229,
+        146,
+        12,
+        180,
+        3
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player_stats",
+          "docs": [
+            "Intentionally not a typed Account — see the module doc comment above."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor",
+          "docs": [
+            "written directly, doesn't even need to sign."
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "record_swap",
+      "discriminator": [
+        164,
+        158,
+        148,
+        54,
+        167,
+        137,
+        171,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "depositor_fee_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "depositor"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "fee_vault_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  101,
+                  101,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "fee_vault_authority"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "guild_filler",
+          "docs": [
+            "be distinct from fee_vault_authority and referrer_filler (see",
+            "constants.rs's own comment on GUILD_FILLER_SEED for why: reusing",
+            "fee_vault_authority here used to collapse three separate token",
+            "accounts into one and crash every swap with no guild/no referrer)."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  117,
+                  105,
+                  108,
+                  100,
+                  95,
+                  102,
+                  105,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "guild_founder_wallet",
+          "docs": [
+            "is joined, or guild_filler as inert filler before any guild is joined —",
+            "the handler only ever transfers to this account when current_guild is",
+            "actually set, so the filler case never gets paid regardless of what's",
+            "passed."
+          ]
+        },
+        {
+          "name": "guild_founder_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "guild_founder_wallet"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "referrer_filler",
+          "docs": [
+            "deliberately a DIFFERENT seed from guild_filler; see that field's own",
+            "comment for why they can't share one."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  102,
+                  101,
+                  114,
+                  114,
+                  101,
+                  114,
+                  95,
+                  102,
+                  105,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "referrer_wallet",
+          "docs": [
+            "referrer_arg this very call is about to set it to for the first time",
+            "(see handle_record_swap's referrer-assignment guard below), OR",
+            "referrer_filler as inert filler when neither applies. The referrer_arg",
+            "branch is required because Anchor validates every account constraint",
+            "BEFORE the handler body runs — reading only player_stats.referrer here",
+            "would still see the pre-call default value on a wallet's very first",
+            "swap after following a referral link, misdirecting that swap's own",
+            "referrer payout into referrer_filler instead of the real referrer",
+            "(confirmed against a real mainnet transaction, 2026-08-22 — the payout",
+            "landed at the referrer_filler PDA instead of the referrer's wallet).",
+            "Mirrors the handler's own `referrer_arg != Pubkey::default() &&",
+            "referrer_arg != depositor_key` guard so a self-referral attempt still",
+            "falls through to the filler here too."
+          ]
+        },
+        {
+          "name": "referrer_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "referrer_wallet"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "guild",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "usd_cents",
+          "type": "u64"
+        },
+        {
+          "name": "fee_amount",
+          "type": "u64"
+        },
+        {
+          "name": "fee_usd_e4",
+          "type": "u64"
+        },
+        {
+          "name": "referrer_arg",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "reset_guild_membership",
+      "discriminator": [
+        17,
+        100,
+        50,
+        51,
+        190,
+        87,
+        122,
+        105
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "address": "CJkDGjo7TdHdLgK3hyLkeSCgaYgoreh2DoUS9qupQuvf"
+        },
+        {
+          "name": "depositor",
+          "docs": [
+            "written directly, doesn't need to sign (the gate is on `authority`)."
+          ]
+        },
+        {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "sweep_fee",
+      "discriminator": [
+        13,
+        53,
+        93,
+        89,
+        43,
+        177,
+        127,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "caller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "fee_vault_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  101,
+                  101,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "fee_vault_authority"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "founder_authority",
+          "docs": [
+            "FOUNDER_AUTHORITY constant so it can't be swapped for anyone else's."
+          ],
+          "address": "CJkDGjo7TdHdLgK3hyLkeSCgaYgoreh2DoUS9qupQuvf"
+        },
+        {
+          "name": "founder_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "founder_authority"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "sweep_legacy_pool",
+      "discriminator": [
+        48,
+        31,
+        5,
+        203,
+        159,
+        185,
+        240,
+        76
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "address": "CJkDGjo7TdHdLgK3hyLkeSCgaYgoreh2DoUS9qupQuvf"
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "pool_vault_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool_vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool_vault_authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "authority_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Counter",
+      "discriminator": [
+        255,
+        176,
+        4,
+        245,
+        188,
+        253,
+        124,
+        25
+      ]
+    },
+    {
+      "name": "Guild",
+      "discriminator": [
+        74,
+        176,
+        57,
+        164,
+        195,
+        188,
+        156,
+        237
+      ]
+    },
+    {
+      "name": "PlayerStats",
+      "discriminator": [
+        169,
+        146,
+        242,
+        176,
+        102,
+        118,
+        231,
+        172
+      ]
+    },
+    {
+      "name": "ReferralCode",
+      "discriminator": [
+        227,
+        239,
+        247,
+        224,
+        128,
+        187,
+        44,
+        229
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Only the counter authority can update this counter"
+    },
+    {
+      "code": 6001,
+      "name": "CounterOverflow",
+      "msg": "Counter has reached the maximum value"
+    },
+    {
+      "code": 6002,
+      "name": "FeeTooSmall",
+      "msg": "Fee amount is below the minimum allowed"
+    },
+    {
+      "code": 6003,
+      "name": "VolumeOverflow",
+      "msg": "Rank volume overflowed"
+    },
+    {
+      "code": 6004,
+      "name": "FeeOverflow",
+      "msg": "House fee total overflowed"
+    },
+    {
+      "code": 6005,
+      "name": "GuildMismatch",
+      "msg": "House account does not match the depositor's current house"
+    },
+    {
+      "code": 6006,
+      "name": "MissingPreviousGuild",
+      "msg": "Switching houses requires passing the previous house account"
+    },
+    {
+      "code": 6007,
+      "name": "NotInGuild",
+      "msg": "This wallet is not currently in a house"
+    },
+    {
+      "code": 6008,
+      "name": "ReferralCodeAlreadyClaimed",
+      "msg": "This wallet has already claimed a referral code"
+    },
+    {
+      "code": 6009,
+      "name": "MissingFounderAttestation",
+      "msg": "Missing or invalid founder attestation for this house"
+    },
+    {
+      "code": 6010,
+      "name": "UsdCentsTooLarge",
+      "msg": "Reported swap volume exceeds the per-swap maximum"
+    }
+  ],
+  "types": [
+    {
+      "name": "Counter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guild",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "founder_wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "member_count",
+            "type": "u64"
+          },
+          {
+            "name": "total_fees_earned_usd_e4",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "depositor",
+            "type": "pubkey"
+          },
+          {
+            "name": "cumulative_volume_cents",
+            "type": "u64"
+          },
+          {
+            "name": "current_guild",
+            "type": "pubkey"
+          },
+          {
+            "name": "current_guild_founder_wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "referrer",
+            "type": "pubkey"
+          },
+          {
+            "name": "my_referral_code",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "earned_for_referrer_usd_e4",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReferralCode",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "ATTESTATION_SIGNER",
+      "type": "pubkey",
+      "value": "HdiEzJP1eS2dmqbo8F1xZpnBTjDLhMZELJXMbwaasr2s"
+    },
+    {
+      "name": "COUNTER_SEED",
+      "type": "bytes",
+      "value": "[99, 111, 117, 110, 116, 101, 114]"
+    },
+    {
+      "name": "FEE_VAULT_AUTHORITY_SEED",
+      "type": "bytes",
+      "value": "[102, 101, 101, 95, 118, 97, 117, 108, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]"
+    },
+    {
+      "name": "FOUNDER_AUTHORITY",
+      "type": "pubkey",
+      "value": "CJkDGjo7TdHdLgK3hyLkeSCgaYgoreh2DoUS9qupQuvf"
+    },
+    {
+      "name": "GUILD_FILLER_SEED",
+      "type": "bytes",
+      "value": "[103, 117, 105, 108, 100, 95, 102, 105, 108, 108, 101, 114]"
+    },
+    {
+      "name": "GUILD_FOUNDER_SHARE_BPS",
+      "type": "u64",
+      "value": "9000"
+    },
+    {
+      "name": "GUILD_FOUNDER_SHARE_WITH_REF_BPS",
+      "type": "u64",
+      "value": "4000"
+    },
+    {
+      "name": "GUILD_SEED",
+      "type": "bytes",
+      "value": "[103, 117, 105, 108, 100]"
+    },
+    {
+      "name": "HELLO_WORLD_LAMPORTS",
+      "type": "u64",
+      "value": "1"
+    },
+    {
+      "name": "MAX_COUNT",
+      "type": "u64",
+      "value": "10"
+    },
+    {
+      "name": "MAX_FEE_USD_E4_PER_SWAP",
+      "type": "u64",
+      "value": "10000000000"
+    },
+    {
+      "name": "MAX_USD_CENTS_PER_SWAP",
+      "type": "u64",
+      "value": "5000000000"
+    },
+    {
+      "name": "MIN_FEE_AMOUNT",
+      "type": "u64",
+      "value": "1000"
+    },
+    {
+      "name": "PLAYER_STATS_SEED",
+      "type": "bytes",
+      "value": "[112, 108, 97, 121, 101, 114, 95, 115, 116, 97, 116, 115]"
+    },
+    {
+      "name": "REFERRER_FILLER_SEED",
+      "type": "bytes",
+      "value": "[114, 101, 102, 101, 114, 114, 101, 114, 95, 102, 105, 108, 108, 101, 114]"
+    },
+    {
+      "name": "REFERRER_SHARE_NO_GUILD_BPS",
+      "type": "u64",
+      "value": "5000"
+    },
+    {
+      "name": "REFERRER_SHARE_WITH_GUILD_BPS",
+      "type": "u64",
+      "value": "5000"
+    },
+    {
+      "name": "REF_CODE_SEED",
+      "type": "bytes",
+      "value": "[114, 101, 102, 95, 99, 111, 100, 101]"
+    },
+    {
+      "name": "TIER_DEGEN_SCORE",
+      "type": "u64",
+      "value": "224"
+    },
+    {
+      "name": "TIER_DOLPHIN_DISCOUNT_BPS",
+      "type": "u64",
+      "value": "1250"
+    },
+    {
+      "name": "TIER_KRAKEN_DISCOUNT_BPS",
+      "type": "u64",
+      "value": "5000"
+    },
+    {
+      "name": "TIER_SHARK_DISCOUNT_BPS",
+      "type": "u64",
+      "value": "2500"
+    },
+    {
+      "name": "TIER_SHARK_SCORE",
+      "type": "u64",
+      "value": "708"
+    },
+    {
+      "name": "TIER_TRADER_SCORE",
+      "type": "u64",
+      "value": "71"
+    },
+    {
+      "name": "TIER_WHALE_DISCOUNT_BPS",
+      "type": "u64",
+      "value": "3750"
+    },
+    {
+      "name": "TIER_WHALE_SCORE",
+      "type": "u64",
+      "value": "2237"
+    },
+    {
+      "name": "VAULT_AUTHORITY_SEED",
+      "type": "bytes",
+      "value": "[118, 97, 117, 108, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]"
+    }
+  ]
+}

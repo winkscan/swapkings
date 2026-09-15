@@ -1,0 +1,51 @@
+{
+  "packageId": "app.swapkings.twa",
+  "host": "swapkings.app",
+  "name": "SwapKings",
+  "launcherName": "SwapKings",
+  "display": "standalone",
+  "themeColor": "#090D10",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#090D10",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://swapkings.app/icons/icon-512.png",
+  "maskableIconUrl": "https://swapkings.app/icons/icon-512-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/home/alexey/projects/solana-swap-rewards/app/android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://swapkings.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://swapkings.app/",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [
+    {
+      "value": "7C:3C:1F:57:CC:81:7F:7C:8A:99:46:96:68:88:34:CF:1B:97:9B:BE:10:62:A9:AD:75:29:40:B3:61:72:84:33"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "1"
+}

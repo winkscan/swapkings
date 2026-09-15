@@ -1,0 +1,23 @@
+.app {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Flex-column children default to a content-based min-width and can overflow
+   past the container instead of shrinking — this is the standard fix. */
+.app > * {
+  min-width: 0;
+}
+
+.wallet-info {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: var(--radius-card);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  word-break: break-all;
+  text-align: left;
+}

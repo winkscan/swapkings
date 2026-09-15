@@ -1,0 +1,25 @@
+name = "swapkings-cache"
+main = "src/index.ts"
+compatibility_date = "2026-08-21"
+
+# Every 2 min (720 ticks/day) was the actual cause of TWO real cost problems,
+# confirmed live 2026-08-22 — 3 KV puts/tick blew past Cloudflare's 1,000
+# puts/day free-tier limit within 24h (fixed by consolidating to 1 KV key —
+# see index.ts), and 3 Helius calls/tick (2 of them getProgramAccounts, the
+# single most heavily-weighted call type per this project's own 2026-08-21
+# Helius audit) added up to real $ with zero real users yet exercising the
+# app. Slowed to once/hour while pre-launch — an hourly-stale DISCOVERY list
+# (every OTHER wallet's guild/fee data) is a non-issue with no real traffic,
+# and a wallet's own join/leave/swap still shows up instantly regardless of
+# this interval (useGuilds.ts's refresh() always reads on-chain directly,
+# bypassing this cache entirely, specifically so a wallet's own action never
+# looks broken). Tighten this again once there's real user traffic to justify
+# the Helius spend.
+[triggers]
+crons = ["0 * * * *"]
+
+# Created via `wrangler kv namespace create CACHE_KV` — paste the id it
+# prints back in here before first deploy (see README.md in this folder).
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "8e6837e852f840b4955d4ab2b45b75df"

@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "SwapKings",
+    "slug": "swapkings",
+    "scheme": "swapkings",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0b0b0f"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.swapkings.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0b0b0f"
+      },
+      "package": "app.swapkings.mobile",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6138f875-0c6c-41a2-ab95-e13154923644"
+      }
+    },
+    "owner": "drbelkin",
+    "updates": {
+      "url": "https://u.expo.dev/6138f875-0c6c-41a2-ab95-e13154923644"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}
