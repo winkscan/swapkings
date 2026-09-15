@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { cacheWorkerUrl } from '../cacheWorker'
+import { dexscreenerIconUrl } from '../jupiterInfo'
 
 // Many pump.fun-era token icons resolve to a raw IPFS gateway URL (ipfs.io,
 // cloudflare-ipfs.com, etc). Those gateways are individually fine (server
@@ -21,33 +22,42 @@ function proxiedIconUrl(url: string): string {
   return base ? `${base}/icon?url=${encodeURIComponent(url)}` : url
 }
 
-// Shared icon-circle used by TokenBadge and every token-picker row. Falls
-// back to a gray circle + question mark whenever there's no icon URL at all,
-// or both the proxied and direct URLs fail to actually load (404, bad host,
-// etc.) — previously a failed load just left an invisible gap.
-export function TokenIcon({ icon, alt, size }: { icon?: string; alt: string; size: number }) {
-  const [src, setSrc] = useState(icon ? proxiedIconUrl(icon) : icon)
-  const [failed, setFailed] = useState(false)
-  const [triedDirect, setTriedDirect] = useState(false)
+// Shared icon-circle used by TokenBadge and every token-picker row. Tries,
+// in order: DexScreener's CDN (deterministic from the mint, reliable even
+// for the launchpad tokens whose Jupiter-reported icon is flaky), then
+// Jupiter's own `icon` through the cache-Worker proxy, then that same icon
+// direct. Falls back to a gray circle + question mark once every candidate
+// (or none at all) fails — previously a failed load just left an invisible
+// gap.
+export function TokenIcon({
+  icon,
+  mint,
+  alt,
+  size,
+}: {
+  icon?: string
+  mint?: string
+  alt: string
+  size: number
+}) {
+  const candidates = useMemo(() => {
+    const list: string[] = []
+    if (mint) list.push(dexscreenerIconUrl(mint))
+    if (icon) {
+      list.push(proxiedIconUrl(icon))
+      list.push(icon)
+    }
+    return list
+  }, [mint, icon])
+  const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    setSrc(icon ? proxiedIconUrl(icon) : icon)
-    setFailed(false)
-    setTriedDirect(false)
-  }, [icon])
+    setIndex(0)
+  }, [candidates.join('|')])
 
-  const handleError = () => {
-    // Proxy failed (Worker down, cold, whatever) — fall back to the direct
-    // URL once before giving up entirely.
-    if (!triedDirect && icon) {
-      setTriedDirect(true)
-      setSrc(icon)
-      return
-    }
-    setFailed(true)
-  }
-
-  const showImg = Boolean(src) && !failed
+  const src = candidates[index]
+  const handleError = () => setIndex((i) => i + 1)
+  const showImg = Boolean(src)
 
   return (
     <div

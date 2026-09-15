@@ -83,7 +83,7 @@ export function TokenBadge({
         flexShrink: 0,
       }}
     >
-      <TokenIcon icon={info?.icon} alt={info?.symbol ?? mint} size={size} />
+      <TokenIcon icon={info?.icon} mint={mint} alt={info?.symbol ?? mint} size={size} />
       {iconOnly ? null : subtitle ? (
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

@@ -27,7 +27,7 @@ function TokenRow({ token, onSelect }: { token: SearchedToken; onSelect: (mint: 
         textAlign: 'left',
       }}
     >
-      <TokenIcon icon={token.icon} alt={token.symbol} size={28} />
+      <TokenIcon icon={token.icon} mint={token.mint} alt={token.symbol} size={28} />
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ fontWeight: 600, fontSize: 14 }}>{token.symbol}</div>
         <div className="text-secondary" style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
