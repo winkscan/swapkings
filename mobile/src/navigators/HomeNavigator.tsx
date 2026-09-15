@@ -27,7 +27,7 @@ const ICONS: Record<string, string> = {
 };
 
 /**
- * Main bottom-tab navigator: Swap · Houses · Friends · Rank · Guide.
+ * Main bottom-tab navigator: Houses · Swap · Rank · Friends · Guide.
  */
 export function HomeNavigator() {
   return (
@@ -56,10 +56,10 @@ export function HomeNavigator() {
         ),
       })}
     >
-      <Tab.Screen name="Swap" component={SwapScreen} />
       <Tab.Screen name="Houses" component={HousesScreen} />
-      <Tab.Screen name="Friends" component={ReferralScreen} />
+      <Tab.Screen name="Swap" component={SwapScreen} />
       <Tab.Screen name="Rank" component={RankScreen} />
+      <Tab.Screen name="Friends" component={ReferralScreen} />
       <Tab.Screen name="Guide" component={GuideScreen} />
     </Tab.Navigator>
   );
