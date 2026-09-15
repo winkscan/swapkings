@@ -13,6 +13,18 @@ export interface SearchedToken extends TokenInfo {
   mint: string
 }
 
+// Jupiter's own `icon` field often points at the token's original launchpad
+// storage (arweave/irys gateways, pump.fun's pinata) — confirmed live
+// (2026-09-15) that these routinely 404 transiently even for tokens Jupiter
+// itself just returned as current, causing most Houses-list icons to fall
+// back to the grey placeholder. DexScreener re-hosts token images on its own
+// CDN keyed only by mint (no lookup call needed) and was verified reliable
+// across the same failing tokens, so it's tried first; Jupiter's `icon`
+// stays as a second attempt for anything DexScreener hasn't indexed yet.
+export function dexscreenerIconUrl(mint: string): string {
+  return `https://dd.dexscreener.com/ds-data/tokens/solana/${mint}.png?size=lg`
+}
+
 export async function getTokenInfos(mints: string[]): Promise<Record<string, TokenInfo>> {
   if (mints.length === 0) return {}
   const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${mints.join(',')}`)

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { Menu, Text, TouchableRipple } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { SWAPKINGS_COLORS } from "../theme";
+import { dexscreenerIconUrl } from "../swapkings/jupiterInfo";
 
 export interface TokenOption {
   key: string;
   symbol: string;
   icon?: string;
+  mint?: string;
 }
 
 // The token selector "pill" from the reference (icon + symbol + chevron,
@@ -64,28 +66,34 @@ export function TokenPill({
 }
 
 export function TokenIcon({ option, size }: { option: TokenOption; size: number }) {
-  const [failCount, setFailCount] = useState(0);
-  // Reset once a different (or newly-resolved) icon URL comes in — otherwise
-  // a token whose icon loaded fine gets stuck on the grey fallback forever
-  // the moment ANY previous URL for that same slot ever failed.
-  const [lastIcon, setLastIcon] = useState(option.icon);
-  if (option.icon !== lastIcon) {
-    setLastIcon(option.icon);
-    setFailCount(0);
+  // DexScreener re-hosts token images on its own CDN keyed only by mint (no
+  // lookup call, no dependency on the launchpad's own storage) — tried
+  // first since it's reliable even for the pump.fun/Token-2022 tokens whose
+  // Jupiter-reported `icon` (arweave/irys/pinata) 404s constantly (confirmed
+  // live, 2026-09-15: most Houses-list icons were failing this way). Jupiter's
+  // `icon` is kept as a second attempt for anything DexScreener hasn't
+  // indexed yet, then the plain letter circle.
+  const candidates = useMemo(() => {
+    const list: string[] = [];
+    if (option.mint) list.push(dexscreenerIconUrl(option.mint));
+    if (option.icon) list.push(option.icon);
+    return list;
+  }, [option.mint, option.icon]);
+  const [index, setIndex] = useState(0);
+  const [seenCandidates, setSeenCandidates] = useState(candidates);
+  if (candidates.join("|") !== seenCandidates.join("|")) {
+    setSeenCandidates(candidates);
+    setIndex(0);
   }
-  // Many houses' icons live on arweave/irys gateways that are genuinely
-  // flaky — a real 404 that clears up a moment later once the gateway's own
-  // cache catches up (confirmed live, 2026-09-11: `x-cache-status: UPDATING`
-  // on a failed fetch of a URL Jupiter itself just returned as current). One
-  // retry after a short delay recovers a real chunk of those instead of
-  // permanently showing the fallback for a token that does have real art.
-  if (option.icon && failCount < 2) {
+
+  const uri = candidates[index];
+  if (uri) {
     return (
       <Image
-        key={`${option.icon}-${failCount}`}
-        source={{ uri: option.icon }}
+        key={uri}
+        source={{ uri }}
         style={{ width: size, height: size, borderRadius: size / 2 }}
-        onError={() => setTimeout(() => setFailCount((n) => n + 1), 800)}
+        onError={() => setIndex((i) => i + 1)}
       />
     );
   }

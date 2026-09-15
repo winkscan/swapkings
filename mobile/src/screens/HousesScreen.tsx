@@ -192,7 +192,12 @@ export function HousesScreen() {
             <View style={styles.rowTop}>
               <View style={styles.rowTitle}>
                 <TokenIcon
-                  option={{ key: item.tokenMint, symbol: item.symbol || 'H', icon: icons[item.tokenMint] }}
+                  option={{
+                    key: item.tokenMint,
+                    symbol: item.symbol || 'H',
+                    icon: icons[item.tokenMint],
+                    mint: item.tokenMint,
+                  }}
                   size={22}
                 />
                 <Text variant="titleMedium" style={styles.flex1}>
@@ -354,7 +359,10 @@ function CurrentHouseHighlight({
   return (
     <View style={styles.highlight}>
       <View style={styles.highlightBadge}>
-        <TokenIcon option={{ key: row.tokenMint, symbol: row.symbol || 'H', icon }} size={18} />
+        <TokenIcon
+          option={{ key: row.tokenMint, symbol: row.symbol || 'H', icon, mint: row.tokenMint }}
+          size={18}
+        />
         <Text style={styles.highlightSymbol}>{row.symbol || shortAddr(row.tokenMint)}</Text>
       </View>
       <View style={styles.highlightHouseRow}>
@@ -433,7 +441,10 @@ function FeesSentTab({
           <Card key={row.signature} style={styles.row}>
             <Card.Content style={styles.feeRow}>
               <View style={styles.feeRowLeft}>
-                <TokenIcon option={{ key: houseMint, symbol: 'H', icon: icons[houseMint] }} size={22} />
+                <TokenIcon
+                  option={{ key: houseMint, symbol: 'H', icon: icons[houseMint], mint: houseMint }}
+                  size={22}
+                />
               </View>
               <TouchableRipple
                 style={styles.feeTxRow}
@@ -447,7 +458,10 @@ function FeesSentTab({
                 </>
               </TouchableRipple>
               <View style={styles.feeAmountRow}>
-                <TokenIcon option={{ key: row.mint, symbol: 'T', icon: icons[row.mint] }} size={14} />
+                <TokenIcon
+                  option={{ key: row.mint, symbol: 'T', icon: icons[row.mint], mint: row.mint }}
+                  size={14}
+                />
                 <Text style={styles.feeAmount}>{formatUsdCompact(row.usdAmount)}</Text>
               </View>
             </Card.Content>

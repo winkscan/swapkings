@@ -224,6 +224,7 @@ export function SwapScreen() {
     key: k,
     symbol: k,
     icon: icons[PRESETS[k].mint],
+    mint: PRESETS[k].mint,
   }))
   const buyOptions = sellOptions
 
@@ -231,8 +232,18 @@ export function SwapScreen() {
     if (!quoteResp || outputDecimals == null) return
     // Snapshot the tokens/amount involved BEFORE the swap resets them, so the
     // result overlay shows what was actually swapped either way.
-    const inToken: TokenOption = { key: sellKey, symbol: sellSymbol, icon: icons[inputMint] }
-    const outToken: TokenOption = { key: buyKey, symbol: buySymbol, icon: icons[outputMint] }
+    const inToken: TokenOption = {
+      key: sellKey,
+      symbol: sellSymbol,
+      icon: icons[inputMint],
+      mint: inputMint,
+    }
+    const outToken: TokenOption = {
+      key: buyKey,
+      symbol: buySymbol,
+      icon: icons[outputMint],
+      mint: outputMint,
+    }
     setSwapping(true)
     try {
       const referrerArg = await resolvePendingReferrer(connection)
@@ -251,7 +262,9 @@ export function SwapScreen() {
         // Placeholder until the resolve-guild-symbol effect below patches in
         // the House's real symbol/icon (mirrors the web app's own
         // getTokenInfoBatched(guildTokenMint) call for this exact line).
-        guildToken: r.guildTokenMint ? { key: 'guild', symbol: shortAddr(r.guildTokenMint) } : null,
+        guildToken: r.guildTokenMint
+          ? { key: 'guild', symbol: shortAddr(r.guildTokenMint), mint: r.guildTokenMint }
+          : null,
         sig: r.sig,
       })
       setAmount('0')
@@ -290,7 +303,9 @@ export function SwapScreen() {
       const info = infos[mint]
       if (!cancelled && info) {
         setOverlay((prev) =>
-          prev ? { ...prev, guildToken: { key: mint, symbol: info.symbol, icon: info.icon } } : prev,
+          prev
+            ? { ...prev, guildToken: { key: mint, symbol: info.symbol, icon: info.icon, mint } }
+            : prev,
         )
       }
     })
@@ -314,7 +329,7 @@ export function SwapScreen() {
               {amount}
             </Text>
             <TokenPill
-              selected={{ key: sellKey, symbol: sellSymbol, icon: icons[inputMint] }}
+              selected={{ key: sellKey, symbol: sellSymbol, icon: icons[inputMint], mint: inputMint }}
               options={sellOptions}
               onSelect={(k) => {
                 setSellKey(k)
@@ -360,7 +375,7 @@ export function SwapScreen() {
               {buyDisplay}
             </Text>
             <TokenPill
-              selected={{ key: buyKey, symbol: buySymbol, icon: icons[outputMint] }}
+              selected={{ key: buyKey, symbol: buySymbol, icon: icons[outputMint], mint: outputMint }}
               options={buyOptions}
               onSelect={(k) => {
                 setBuyKey(k)
