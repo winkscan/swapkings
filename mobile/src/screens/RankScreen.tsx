@@ -1,6 +1,7 @@
 import React from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
 import { useAuthorization } from '../utils/useAuthorization'
 import { useMobileWallet } from '../utils/useMobileWallet'
@@ -30,7 +31,12 @@ export function RankScreen() {
         <Text variant="titleMedium" style={styles.mb}>
           Connect your wallet to see your LUCK tier
         </Text>
-        <Button mode="contained" onPress={() => connect()}>
+        <Button
+          mode="contained"
+          onPress={() => connect()}
+          style={styles.connectBtn}
+          icon={({ size, color }) => <FontAwesome6 name="wallet" size={size * 0.85} color={color} />}
+        >
           Connect wallet
         </Button>
       </View>
@@ -117,6 +123,7 @@ const styles = StyleSheet.create({
   container: { padding: 20, paddingBottom: 48 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   mb: { marginBottom: 16, textAlign: 'center' },
+  connectBtn: { borderRadius: 16 },
   card: { backgroundColor: C.bgElevated, borderRadius: 20, padding: 16 },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   tierNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },

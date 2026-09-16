@@ -434,6 +434,7 @@ export function SwapScreen() {
             loading={swapping}
             style={styles.action}
             contentStyle={styles.actionContent}
+            icon={({ size, color }) => <FontAwesome6 name="right-left" size={size * 0.85} color={color} />}
           >
             {swapping ? 'Swapping…' : 'Swap'}
           </Button>
@@ -443,6 +444,7 @@ export function SwapScreen() {
             onPress={() => connect()}
             style={styles.action}
             contentStyle={styles.actionContent}
+            icon={({ size, color }) => <FontAwesome6 name="wallet" size={size * 0.85} color={color} />}
           >
             Connect wallet
           </Button>

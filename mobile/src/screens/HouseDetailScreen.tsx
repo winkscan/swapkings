@@ -83,6 +83,9 @@ export function HouseDetailScreen({ route, navigation }: Props) {
             loading={busy}
             disabled={busy || !selectedAccount}
             onPress={() => onLeave(row)}
+            icon={({ size, color }) => (
+              <FontAwesome6 name="right-from-bracket" size={size * 0.85} color={color} />
+            )}
           >
             Leave
           </Button>
@@ -96,6 +99,9 @@ export function HouseDetailScreen({ route, navigation }: Props) {
             loading={busy}
             disabled={busy || belowFloor || !selectedAccount}
             onPress={() => onJoin(row)}
+            icon={({ size, color }) => (
+              <FontAwesome6 name={inAGuild ? 'arrows-rotate' : 'door-open'} size={size * 0.85} color={color} />
+            )}
           >
             {inAGuild ? 'Switch to this House' : 'Join House'}
           </Button>
@@ -122,7 +128,7 @@ export function HouseDetailScreen({ route, navigation }: Props) {
 
         {err ? <Text style={styles.errorText}>{err}</Text> : null}
 
-        <Text variant="titleMedium" style={styles.sectionTitle}>
+        <Text variant="titleLarge" style={styles.sectionTitle}>
           Recent fees
         </Text>
         {feesLoading && feeRows.length === 0 ? (
@@ -163,7 +169,7 @@ const styles = StyleSheet.create({
   body: { padding: 20 },
   headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerTitleText: { color: C.textPrimary },
-  bigButton: { borderRadius: 14, marginTop: 4, marginBottom: 20 },
+  bigButton: { borderRadius: 16, marginTop: 4, marginBottom: 20 },
   bigButtonContent: { height: 48 },
   statsCard: {
     flexDirection: 'row',
@@ -176,7 +182,7 @@ const styles = StyleSheet.create({
   statValue: { color: C.textPrimary, fontWeight: '700', fontSize: 15 },
   statLabel: { color: C.textSecondary, fontSize: 11 },
   errorText: { color: C.negative, marginBottom: 12 },
-  sectionTitle: { color: C.textPrimary, marginBottom: 10 },
+  sectionTitle: { color: C.textPrimary, fontWeight: '700', marginBottom: 20 },
   loading: { marginTop: 16 },
   dim: { color: C.textSecondary, opacity: 0.7 },
   feeRow: {

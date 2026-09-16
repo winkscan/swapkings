@@ -66,7 +66,12 @@ export function ReferralScreen() {
         <Text variant="titleMedium" style={styles.mb}>
           Connect your wallet for your referral link
         </Text>
-        <Button mode="contained" onPress={() => connect()}>
+        <Button
+          mode="contained"
+          onPress={() => connect()}
+          style={styles.btnRadius}
+          icon={({ size, color }) => <FontAwesome6 name="wallet" size={size * 0.85} color={color} />}
+        >
           Connect wallet
         </Button>
       </View>
@@ -77,7 +82,9 @@ export function ReferralScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
-          <Text variant="titleMedium">Your referral link</Text>
+          <Text variant="titleLarge" style={styles.cardTitle}>
+            Your referral link
+          </Text>
           <Text variant="bodySmall" style={styles.dim}>
             You earn 50% of the platform fee on every swap anyone you refer makes — forever, in the
             same transaction.
@@ -91,6 +98,7 @@ export function ReferralScreen() {
               <View style={styles.rowBtns}>
                 <Button
                   mode="contained"
+                  style={styles.btnRadius}
                   icon={({ size, color }) => (
                     <FontAwesome6 name="share-nodes" size={size} color={color} />
                   )}
@@ -100,6 +108,7 @@ export function ReferralScreen() {
                 </Button>
                 <Button
                   mode="outlined"
+                  style={styles.btnRadius}
                   icon={({ size, color }) => <FontAwesome6 name="copy" size={size} color={color} />}
                   onPress={onCopy}
                 >
@@ -113,7 +122,8 @@ export function ReferralScreen() {
               onPress={onClaim}
               loading={claiming}
               disabled={claiming}
-              style={styles.mt}
+              style={[styles.mt, styles.btnRadius]}
+              icon={({ size, color }) => <FontAwesome6 name="link" size={size * 0.85} color={color} />}
             >
               {claiming ? 'Claiming…' : 'Claim your link'}
             </Button>
@@ -128,7 +138,9 @@ export function ReferralScreen() {
 
       <Card style={styles.card}>
         <Card.Content>
-          <Text variant="titleMedium">Were you referred?</Text>
+          <Text variant="titleLarge" style={styles.cardTitle}>
+            Were you referred?
+          </Text>
           {referredBy ? (
             <Text variant="bodyMedium" style={styles.mt}>
               Referred by {shortAddr(referredBy)} — locked in on-chain.
@@ -141,7 +153,11 @@ export function ReferralScreen() {
               <Text variant="bodySmall" style={styles.dim}>
                 It attaches to your wallet on your next swap.
               </Text>
-              <Button mode="text" onPress={() => setPendingCode(null)}>
+              <Button
+                mode="text"
+                onPress={() => setPendingCode(null)}
+                icon={({ size, color }) => <FontAwesome6 name="xmark" size={size * 0.85} color={color} />}
+              >
                 Clear
               </Button>
             </>
@@ -163,7 +179,8 @@ export function ReferralScreen() {
                   setPendingCode(friendInput.trim())
                   setFriendInput('')
                 }}
-                style={styles.mt}
+                style={[styles.mt, styles.btnRadius]}
+                icon={({ size, color }) => <FontAwesome6 name="check" size={size * 0.85} color={color} />}
               >
                 Save code
               </Button>
@@ -180,6 +197,10 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   mb: { marginBottom: 16, textAlign: 'center' },
   card: { marginBottom: 20 },
+  // Same size/weight as every other card heading in the app (Rank's own
+  // "Rank tiers" title is the reference).
+  cardTitle: { color: SWAPKINGS_COLORS.textPrimary, fontWeight: '700', marginBottom: 4 },
+  btnRadius: { borderRadius: 16 },
   dim: { opacity: 0.7, marginTop: 4 },
   link: { color: SWAPKINGS_COLORS.accent, marginVertical: 10 },
   rowBtns: { flexDirection: 'row', gap: 10 },

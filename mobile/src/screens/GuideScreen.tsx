@@ -313,7 +313,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   accordionHeader: { backgroundColor: C.bgElevated, paddingVertical: 2 },
-  accordionTitle: { color: C.textPrimary, fontSize: 16, fontWeight: '700' },
+  // Same size/weight as every other card heading in the app (Rank's own
+  // "Rank tiers" title is the reference — MD3 titleLarge, 22px/700).
+  accordionTitle: { color: C.textPrimary, fontSize: 22, fontWeight: '700' },
   iconWrap: { width: 24, alignItems: 'center', justifyContent: 'center', marginLeft: 4 },
   body: { paddingHorizontal: 16, paddingBottom: 16 },
 

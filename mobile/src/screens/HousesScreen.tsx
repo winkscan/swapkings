@@ -88,7 +88,12 @@ export function HousesScreen() {
         <Text variant="titleMedium" style={styles.mb}>
           Connect your wallet to join a House
         </Text>
-        <Button mode="contained" onPress={() => connect()}>
+        <Button
+          mode="contained"
+          onPress={() => connect()}
+          style={styles.connectBtn}
+          icon={({ size, color }) => <FontAwesome6 name="wallet" size={size * 0.85} color={color} />}
+        >
           Connect wallet
         </Button>
       </View>
@@ -171,6 +176,7 @@ export function HousesScreen() {
         <Modal
           visible={addVisible}
           onDismiss={() => setAddVisible(false)}
+          style={styles.modalOverlay}
           contentContainerStyle={styles.modalContainer}
         >
           <AddHouseForm
@@ -313,30 +319,33 @@ function AddHouseForm({ guilds, onAdd }: { guilds: GuildRow[]; onAdd: (row: Guil
 
   return (
     <View>
-      <Text variant="titleMedium" style={styles.addTitle}>
+      <Text variant="titleLarge" style={styles.addTitle}>
         Don&apos;t see your token?
       </Text>
-      <View style={styles.addRow}>
-        <TextInput
-          mode="outlined"
-          dense
-          placeholder="Token mint address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          value={mint}
-          onChangeText={setMint}
-          style={styles.addInput}
-        />
-        <Button
-          mode="contained"
-          onPress={handleAdd}
-          disabled={checking || !trimmed || !!existing}
-          loading={checking}
-          icon={({ size, color }) => <FontAwesome6 name="plus" size={size * 0.75} color={color} />}
-        >
-          {checking ? 'Checking…' : 'Add'}
-        </Button>
-      </View>
+      <TextInput
+        mode="outlined"
+        dense
+        placeholder="Token mint address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        value={mint}
+        onChangeText={setMint}
+        style={styles.addInput}
+        outlineStyle={styles.searchOutline}
+      />
+      <Button
+        mode="contained"
+        buttonColor={C.bgHover}
+        textColor={C.textPrimary}
+        style={styles.addSubmitBtn}
+        contentStyle={styles.addBtnContent}
+        onPress={handleAdd}
+        disabled={checking || !trimmed || !!existing}
+        loading={checking}
+        icon={({ size, color }) => <FontAwesome6 name="plus" size={size * 0.75} color={color} />}
+      >
+        {checking ? 'Checking…' : 'Add'}
+      </Button>
       <Text variant="bodySmall" style={styles.addHelper}>
         Supports tokens from pump.fun, letsbonk.fun, Meteora, Jupiter Studio, and Moonshot, above a{' '}
         {formatUsdCompact(GUILD_MARKET_CAP_FLOOR_USD)} market cap.
@@ -359,6 +368,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   mb: { marginBottom: 16, textAlign: 'center' },
+  connectBtn: { borderRadius: 16 },
   stickyHeader: { flexDirection: 'row', alignItems: 'center', gap: 20, margin: 20, marginBottom: 20 },
   list: { paddingHorizontal: 20, paddingBottom: 20 },
   dim: { opacity: 0.7 },
@@ -413,14 +423,20 @@ const styles = StyleSheet.create({
   addBtn: { borderRadius: 16 },
   addBtnContent: { height: 40 },
 
+  // Raised toward the top instead of the Modal's default vertical-center,
+  // so it doesn't land in the middle of the screen (user feedback,
+  // 2026-09-16).
+  modalOverlay: { justifyContent: 'flex-start', paddingTop: 100 },
   modalContainer: {
     backgroundColor: C.bgElevated,
     borderRadius: 20,
     padding: 20,
     marginHorizontal: 20,
   },
-  addTitle: { color: C.textPrimary, marginBottom: 10 },
-  addRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
-  addInput: { flex: 1, backgroundColor: 'transparent' },
+  // Same size as every other card heading in the app (see e.g. Rank's own
+  // "Rank tiers" title) — a standing rule, not just this popup.
+  addTitle: { color: C.textPrimary, fontWeight: '700', marginBottom: 20 },
+  addInput: { width: '100%', height: 40, backgroundColor: 'transparent', marginBottom: 20 },
+  addSubmitBtn: { width: '100%', borderRadius: 16 },
   addHelper: { color: C.textSecondary, marginTop: 10 },
 })
