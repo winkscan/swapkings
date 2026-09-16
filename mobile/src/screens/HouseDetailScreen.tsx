@@ -36,10 +36,15 @@ export function HouseDetailScreen({ route, navigation }: Props) {
   // redundant with this and has been dropped (user feedback, 2026-09-15).
   useLayoutEffect(() => {
     navigation.setOptions({
+      // Pulled as far left as native-stack allows — it has no
+      // headerTitleContainerStyle (that's a classic-stack-only option), so
+      // the extra gap after the back arrow is closed with a negative margin
+      // on the title view itself instead (user feedback, 2026-09-16).
+      headerTitleAlign: 'left',
       headerTitle: () => (
         <View style={styles.headerTitle}>
           <TokenIcon option={{ key: tokenMint, symbol: row?.symbol || 'H', mint: tokenMint }} size={22} />
-          <Text variant="titleMedium" style={styles.headerTitleText}>
+          <Text variant="titleLarge" style={styles.headerTitleText}>
             {row?.symbol || shortAddr(tokenMint)}
           </Text>
         </View>
@@ -109,20 +114,27 @@ export function HouseDetailScreen({ route, navigation }: Props) {
 
         <View style={styles.statsCard}>
           <View style={styles.statBlock}>
-            <FontAwesome6 name="users" size={14} color={C.textSecondary} />
             <Text style={styles.statValue}>{row.memberCount}</Text>
+            <View style={styles.statLabelRow}>
+              <FontAwesome6 name="people-group" size={12} color={C.textSecondary} />
+              <Text style={styles.statLabel}>Crew</Text>
+            </View>
           </View>
           <View style={styles.statBlock}>
-            <FontAwesome6 name="briefcase" size={14} color={C.textSecondary} />
             <Text style={styles.statValue}>
               {row.marketCapUsd !== undefined ? formatUsdCompact(row.marketCapUsd) : '—'}
             </Text>
-            <Text style={styles.statLabel}>Market Cap</Text>
+            <View style={styles.statLabelRow}>
+              <FontAwesome6 name="briefcase" size={12} color={C.textSecondary} />
+              <Text style={styles.statLabel}>Market Cap</Text>
+            </View>
           </View>
           <View style={styles.statBlock}>
-            <FontAwesome6 name="hand-holding-dollar" size={14} color={C.textSecondary} />
             <Text style={styles.statValue}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
-            <Text style={styles.statLabel}>Fees earned</Text>
+            <View style={styles.statLabelRow}>
+              <FontAwesome6 name="hand-holding-dollar" size={12} color={C.textSecondary} />
+              <Text style={styles.statLabel}>Fees earned</Text>
+            </View>
           </View>
         </View>
 
@@ -167,8 +179,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   content: { paddingBottom: 32 },
   body: { padding: 20 },
-  headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerTitleText: { color: C.textPrimary },
+  headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: -16 },
+  headerTitleText: { color: C.textPrimary, fontWeight: '700' },
   bigButton: { borderRadius: 16, marginTop: 4, marginBottom: 20 },
   bigButtonContent: { height: 48 },
   statsCard: {
@@ -179,12 +191,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statBlock: { flex: 1, alignItems: 'center', gap: 4 },
+  statLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   statValue: { color: C.textPrimary, fontWeight: '700', fontSize: 15 },
   statLabel: { color: C.textSecondary, fontSize: 11 },
   errorText: { color: C.negative, marginBottom: 12 },
   sectionTitle: { color: C.textPrimary, fontWeight: '700', marginBottom: 20 },
   loading: { marginTop: 16 },
   dim: { color: C.textSecondary, opacity: 0.7 },
+  // Exception to the app's usual 20px between-block spacing — this is a
+  // dense list of many small transaction rows, not a handful of major
+  // sections, so 20px read as too loose here (user feedback, 2026-09-16).
   feeRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -193,10 +209,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   feeTxRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   feeTx: { color: C.textSecondary },
   feeAmountRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  feeAmount: { color: C.positive, fontWeight: '700' },
+  feeAmount: { color: C.textPrimary, fontWeight: '700' },
 })
