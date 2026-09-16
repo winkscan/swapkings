@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Animated, FlatList, Pressable, StyleSheet, View } from 'react-native'
 import {
   ActivityIndicator,
   Button,
   HelperText,
-  Modal,
   Portal,
   Text,
   TextInput,
   TouchableRipple,
 } from 'react-native-paper'
+import { BlurView } from 'expo-blur'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import { PublicKey } from '@solana/web3.js'
@@ -172,23 +172,54 @@ export function HousesScreen() {
         refreshing={loading}
       />
 
-      <Portal>
-        <Modal
-          visible={addVisible}
-          onDismiss={() => setAddVisible(false)}
-          style={styles.modalOverlay}
-          contentContainerStyle={styles.modalContainer}
-        >
-          <AddHouseForm
-            guilds={guilds}
-            onAdd={(row) => {
-              addManualRow(row)
-              setAddVisible(false)
-            }}
-          />
-        </Modal>
-      </Portal>
+      <AddHouseModal visible={addVisible} onDismiss={() => setAddVisible(false)}>
+        <AddHouseForm
+          guilds={guilds}
+          onAdd={(row) => {
+            addManualRow(row)
+            setAddVisible(false)
+          }}
+        />
+      </AddHouseModal>
     </View>
+  )
+}
+
+// A blurred backdrop (instead of react-native-paper's own Modal, whose
+// plain dark scrim barely darkens an already-dark screen) so the popup
+// actually stands apart from the Houses list behind it, instead of
+// blending into it (user feedback, 2026-09-16). Fades in on open; closes
+// instantly on backdrop tap or a successful add.
+function AddHouseModal({
+  visible,
+  onDismiss,
+  children,
+}: {
+  visible: boolean
+  onDismiss: () => void
+  children: React.ReactNode
+}) {
+  const opacity = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
+    if (visible) {
+      opacity.setValue(0)
+      Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }).start()
+    }
+  }, [visible, opacity])
+
+  if (!visible) return null
+
+  return (
+    <Portal>
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity }]}>
+        <BlurView intensity={45} tint="dark" style={StyleSheet.absoluteFill} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={onDismiss} />
+        <View style={styles.modalPositioner} pointerEvents="box-none">
+          <View style={styles.modalContainer}>{children}</View>
+        </View>
+      </Animated.View>
+    </Portal>
   )
 }
 
@@ -423,15 +454,22 @@ const styles = StyleSheet.create({
   addBtn: { borderRadius: 16 },
   addBtnContent: { height: 40 },
 
-  // Raised toward the top instead of the Modal's default vertical-center,
-  // so it doesn't land in the middle of the screen (user feedback,
-  // 2026-09-16).
-  modalOverlay: { justifyContent: 'flex-start', paddingTop: 100 },
+  // Raised toward the top instead of screen-center, so it doesn't land in
+  // the middle of the screen (user feedback, 2026-09-16).
+  modalPositioner: { flex: 1, justifyContent: 'flex-start', paddingTop: 100 },
   modalContainer: {
     backgroundColor: C.bgElevated,
     borderRadius: 20,
     padding: 20,
     marginHorizontal: 20,
+    // A bit more shadow than the app's other cards get, since this one
+    // needs to visibly float above the blurred backdrop (user feedback,
+    // 2026-09-16).
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 16,
   },
   // Same size as every other card heading in the app (see e.g. Rank's own
   // "Rank tiers" title) — a standing rule, not just this popup.
