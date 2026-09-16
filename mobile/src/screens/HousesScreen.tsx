@@ -116,6 +116,14 @@ export function HousesScreen() {
               icon={() => <FontAwesome6 name="magnifying-glass" size={14} color={C.textSecondary} />}
             />
           }
+          right={
+            search ? (
+              <TextInput.Icon
+                icon={() => <FontAwesome6 name="xmark" size={14} color={C.textSecondary} />}
+                onPress={() => setSearch('')}
+              />
+            ) : undefined
+          }
         />
         <Button
           mode="contained"
@@ -399,20 +407,12 @@ const styles = StyleSheet.create({
 
   houseCardTouch: { borderRadius: 20, marginBottom: 10, overflow: 'hidden' },
   houseCard: { backgroundColor: C.bgElevated },
-  houseCardBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: C.bg,
-    borderRadius: 16,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-  houseCardSymbol: { color: C.textPrimary, fontWeight: '700' },
-  houseCardFee: { color: C.positive, fontWeight: '700', fontSize: 20 },
+  houseCardBadge: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  houseCardSymbol: { color: C.textPrimary, fontWeight: '700', fontSize: 16 },
+  houseCardFee: { color: C.positive, fontWeight: '700', fontSize: 16 },
   houseCardSubText: { color: C.textSecondary, fontSize: 12 },
 
-  searchInput: { flex: 1, backgroundColor: 'transparent' },
+  searchInput: { flex: 1, height: 40, backgroundColor: 'transparent' },
   searchOutline: { borderRadius: 16 },
   addBtn: { borderRadius: 16 },
   addBtnContent: { height: 40 },
