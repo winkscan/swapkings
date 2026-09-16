@@ -105,7 +105,6 @@ export function HouseDetailScreen({ route, navigation }: Props) {
           <View style={styles.statBlock}>
             <FontAwesome6 name="users" size={14} color={C.textSecondary} />
             <Text style={styles.statValue}>{row.memberCount}</Text>
-            <Text style={styles.statLabel}>Members</Text>
           </View>
           <View style={styles.statBlock}>
             <FontAwesome6 name="briefcase" size={14} color={C.textSecondary} />

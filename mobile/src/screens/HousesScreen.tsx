@@ -215,9 +215,7 @@ function CurrentHouseHighlight({ row }: { row: GuildRow }) {
           </View>
           <View style={styles.statsInline}>
             <FontAwesome6 name="users" size={11} color={C.textSecondary} />
-            <Text style={styles.highlightMembers}>
-              {row.memberCount} member{row.memberCount === 1 ? '' : 's'}
-            </Text>
+            <Text style={styles.highlightMembers}>{row.memberCount}</Text>
           </View>
         </View>
       </View>
@@ -255,9 +253,7 @@ function HouseCard({ row, onPress }: { row: GuildRow; onPress: () => void }) {
             </View>
             <View style={styles.statsInline}>
               <FontAwesome6 name="users" size={11} color={C.textSecondary} />
-              <Text style={styles.houseCardSubText}>
-                {row.memberCount} member{row.memberCount === 1 ? '' : 's'}
-              </Text>
+              <Text style={styles.houseCardSubText}>{row.memberCount}</Text>
             </View>
           </View>
         </View>
