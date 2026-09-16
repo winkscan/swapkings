@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShield, faHandHoldingDollar, faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { faPeopleGroup, faHandHoldingDollar, faChartLine } from '@fortawesome/free-solid-svg-icons'
 import { useGuilds } from '../useGuilds'
 import { useAllTimeVolume } from '../useAllTimeVolume'
 import { formatUsdCompact } from '../format'
@@ -28,8 +28,8 @@ export function VaultStats() {
             className="text-secondary"
             style={{ fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 6 }}
           >
-            <FontAwesomeIcon icon={faShield} />
-            Houses
+            <FontAwesomeIcon icon={faPeopleGroup} />
+            Crews
           </div>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--positive)' }}>
             {guildsLoading ? '…' : totalGuilds.toLocaleString('en-US')}

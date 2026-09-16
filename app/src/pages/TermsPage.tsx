@@ -58,16 +58,16 @@ export function TermsPage() {
         </p>
       </Section>
 
-      <Section icon={faCoins} title="Fees, Houses, and referrals">
+      <Section icon={faCoins} title="Fees, Crews, and referrals">
         <p style={{ margin: 0, marginBottom: 8 }}>
           SwapKings charges a platform fee (0.2% before any LUCK-tier discount) on top of Jupiter's
           own routing — see the <Link to="/rules">Rules</Link> page for exactly how that fee splits
-          between Houses, referrals, and the platform. These mechanics are deterministic and run
+          between Crews, referrals, and the platform. These mechanics are deterministic and run
           on-chain in the same transaction as your swap; they can change in future versions of this
           app, but never retroactively for a swap you've already made.
         </p>
         <p style={{ margin: 0 }}>
-          Houses route a share of your fee to a token's on-chain creator wallet, resolved
+          Crews route a share of your fee to a token's on-chain creator wallet, resolved
           automatically — we don't vet or endorse any individual token or its creator by including it.
         </p>
       </Section>

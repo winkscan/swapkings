@@ -11,7 +11,7 @@ export function wasCancelled(err: unknown): boolean {
 // has drifted past the quote's allowed tolerance — common after navigating
 // away and back before hitting Swap, or just real market movement between
 // quote and send. Confirmed live 2026-08-22: a real swap failed this way
-// right after switching to the Houses page and back. Detected via the
+// right after switching to the Crews page and back. Detected via the
 // Jupiter program ID + the exact hex code appearing together in the
 // simulation logs bundled into swapExecutor.ts's error message — the bare
 // error number 6001 alone isn't a reliable signal, since our own program

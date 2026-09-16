@@ -13,22 +13,26 @@ import { SWAPKINGS_COLORS as C } from "../theme";
 const Tab = createBottomTabNavigator();
 
 // Same icon choices as the web app's own NavBar.tsx (FontAwesome
-// faRightLeft/faShield/faUsers) — "Friends" is this app's route name for
-// ReferralScreen, matching the web app's own /friends label (user's own
-// follow-up request, 2026-09-11). Rank has no web equivalent, "trophy" fits
-// the LUCK-tier theme. The free FontAwesome6 set only ships these glyphs in
-// "solid" (no outline variant), so focus is shown by color, not shape —
-// matches how react-navigation already drives tabBarActiveTintColor.
+// faRightLeft/faPeopleGroup/faUserPlus) — "Friends" is this app's route
+// name for ReferralScreen, matching the web app's own /friends label
+// (user's own follow-up request, 2026-09-11); "Crews" is the route name
+// for HousesScreen — "House" read as unclear to newcomers ("is this a new
+// token?"), renamed to "Crew" everywhere, icon changed from a shield to
+// people-group to match (user follow-up, 2026-09-16). Rank has no web
+// equivalent, "trophy" fits the LUCK-tier theme. The free FontAwesome6 set
+// only ships these glyphs in "solid" (no outline variant), so focus is
+// shown by color, not shape — matches how react-navigation already drives
+// tabBarActiveTintColor.
 const ICONS: Record<string, string> = {
   Swap: "right-left",
-  Houses: "shield",
-  Friends: "users",
+  Crews: "people-group",
+  Friends: "user-plus",
   Rank: "trophy",
   Guide: "book",
 };
 
 /**
- * Main bottom-tab navigator: Houses · Swap · Rank · Friends · Guide.
+ * Main bottom-tab navigator: Crews · Swap · Rank · Friends · Guide.
  */
 export function HomeNavigator() {
   return (
@@ -57,7 +61,7 @@ export function HomeNavigator() {
         ),
       })}
     >
-      <Tab.Screen name="Houses">{() => <FadeOnFocus><HousesScreen /></FadeOnFocus>}</Tab.Screen>
+      <Tab.Screen name="Crews">{() => <FadeOnFocus><HousesScreen /></FadeOnFocus>}</Tab.Screen>
       <Tab.Screen name="Swap">{() => <FadeOnFocus><SwapScreen /></FadeOnFocus>}</Tab.Screen>
       <Tab.Screen name="Rank">{() => <FadeOnFocus><RankScreen /></FadeOnFocus>}</Tab.Screen>
       <Tab.Screen name="Friends">{() => <FadeOnFocus><ReferralScreen /></FadeOnFocus>}</Tab.Screen>

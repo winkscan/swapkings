@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faArrowRight, faShield } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faArrowRight, faPeopleGroup } from '@fortawesome/free-solid-svg-icons'
 import problemImg from '../assets/onboarding-problem.webp'
 import solutionImg from '../assets/onboarding-solution.webp'
 
@@ -16,7 +16,7 @@ const STEPS = [
   {
     image: solutionImg,
     title: 'Every swap can pay tribute to your king',
-    body: 'Join a house, and a share of your platform fee flows to that founder on every swap you make — any coins, any direction, not just theirs. A whole kingdom of trades becomes real, ongoing revenue for the founder you believe in.',
+    body: 'Join a crew, and a share of your platform fee flows to that founder on every swap you make — any coins, any direction, not just theirs. A whole kingdom of trades becomes real, ongoing revenue for the founder you believe in.',
   },
 ] as const
 
@@ -25,7 +25,7 @@ const STEPS = [
 // separate checkbox instead of just tracking "have they seen this" (which
 // would make the checkbox redundant). Mounted once at the App level so it
 // triggers regardless of which page a new visitor lands on first (a shared
-// /houses or /friends link, not just the home swap page).
+// /crews or /friends link, not just the home swap page).
 export function OnboardingModal() {
   const navigate = useNavigate()
   const [visible, setVisible] = useState(() => {
@@ -58,7 +58,7 @@ export function OnboardingModal() {
   const handlePrimary = () => {
     if (isLastStep) {
       close()
-      navigate('/houses')
+      navigate('/crews')
       return
     }
     setStep((s) => s + 1)
@@ -186,8 +186,8 @@ export function OnboardingModal() {
             >
               {isLastStep ? (
                 <>
-                  <FontAwesomeIcon icon={faShield} />
-                  Join House
+                  <FontAwesomeIcon icon={faPeopleGroup} />
+                  Join Crew
                 </>
               ) : (
                 <>

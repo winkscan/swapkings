@@ -9,8 +9,8 @@ import {
   faCircleXmark,
   faCrown,
   faMagnifyingGlass,
+  faPeopleGroup,
   faPlus,
-  faShield,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons'
 import { NavBar } from '../components/NavBar'
@@ -83,7 +83,7 @@ function CurrentGuildHighlight({ row, onLeave, busy }: { row: GuildRow; onLeave:
         </div>
         <span className="guild-highlight__house" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#000' }}>
           <FontAwesomeIcon icon={faCrown} style={{ color: '#000' }} />
-          Your house
+          Your crew
         </span>
         <div className="guild-highlight__fee" style={{ textAlign: 'right' }}>
           <div style={{ fontWeight: 700, color: '#000' }}>{formatUsdCompact(row.totalFeesEarnedUsd)}</div>
@@ -315,7 +315,7 @@ function FeesEarnedTab({
   return (
     <div className="card">
       <div className="text-secondary" style={{ fontSize: 12, marginBottom: 12 }}>
-        Most recent house-fee payouts, newest first.
+        Most recent crew-fee payouts, newest first.
       </div>
 
       {history.loading && history.rows.length === 0 && <p style={{ padding: 20 }}>Loading…</p>}
@@ -323,7 +323,7 @@ function FeesEarnedTab({
         <p style={{ padding: 20, color: 'var(--negative)' }}>Couldn't load history: {history.error}</p>
       )}
       {!history.loading && !history.error && history.rows.length === 0 && (
-        <p style={{ padding: 20 }}>No house-fee transactions yet.</p>
+        <p style={{ padding: 20 }}>No crew-fee transactions yet.</p>
       )}
 
       {history.rows.length > 0 && (
@@ -333,8 +333,8 @@ function FeesEarnedTab({
             <tr>
               <th>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <FontAwesomeIcon icon={faShield} />
-                  House
+                  <FontAwesomeIcon icon={faPeopleGroup} />
+                  Crew
                 </span>
               </th>
               <th>Tx</th>
@@ -385,8 +385,8 @@ export function GuildsPage() {
   const [actionError, setActionError] = useState<unknown>(undefined)
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
-  // Direct-link support for outreach ("here's your House, one click") —
-  // swapkings.app/houses?mint=<address> pre-fills the search box with that
+  // Direct-link support for outreach ("here's your Crew, one click") —
+  // swapkings.app/crews?mint=<address> pre-fills the search box with that
   // exact mint on load, same as typing it in by hand. Only reads the param
   // once on mount (an empty dependency array, matching every other
   // once-on-load URL-param read in this codebase, e.g. useReferral.ts's
@@ -584,7 +584,7 @@ export function GuildsPage() {
 
       <div className="pill-tabs" style={{ marginBottom: 16, alignSelf: 'center' }}>
         <button className={tab === 'guilds' ? 'active' : ''} onClick={() => setTab('guilds')}>
-          Houses
+          Crews
         </button>
         <button className={tab === 'fees' ? 'active' : ''} onClick={() => setTab('fees')}>
           Fees sent
@@ -632,7 +632,7 @@ export function GuildsPage() {
             {!loading && filtered.length === 0 && (
               <p style={{ padding: 20 }}>
                 <FontAwesomeIcon icon={faUsers} style={{ marginRight: 8 }} />
-                {guilds.length === 0 ? 'No qualifying houses found right now.' : 'No match for that search.'}
+                {guilds.length === 0 ? 'No qualifying crews found right now.' : 'No match for that search.'}
               </p>
             )}
             {!loading && filtered.length > 0 && (

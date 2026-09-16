@@ -39,7 +39,7 @@ export interface FounderAttestation {
 export async function getFounderAttestation(mint: string, founder: string): Promise<FounderAttestation> {
   const base = cacheWorkerUrl()
   if (!base) {
-    throw new Error('Cache Worker URL not configured — cannot verify this house\'s founder.')
+    throw new Error('Cache Worker URL not configured — cannot verify this crew\'s founder.')
   }
   const res = await fetch(`${base}/founder-attestation?mint=${mint}&founder=${founder}`)
   const body = (await res.json().catch(() => ({}))) as { error?: string; signature?: string; publicKey?: string }

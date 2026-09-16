@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faRightLeft, faShield, faUsers, faCrown, faBook } from '@fortawesome/free-solid-svg-icons'
+import { faRightLeft, faPeopleGroup, faUserPlus, faCrown, faBook } from '@fortawesome/free-solid-svg-icons'
 import { WalletButton } from './WalletButton'
 
 // The primary tab bar — icon-over-label, fixed to the bottom edge at every
@@ -12,8 +12,8 @@ import { WalletButton } from './WalletButton'
 // own tab rather than being buried in a page.
 const TABS = [
   { to: '/', icon: faRightLeft, label: 'Swap', connectedOnly: false },
-  { to: '/houses', icon: faShield, label: 'Houses', connectedOnly: false },
-  { to: '/friends', icon: faUsers, label: 'Friends', connectedOnly: true },
+  { to: '/crews', icon: faPeopleGroup, label: 'Crews', connectedOnly: false },
+  { to: '/friends', icon: faUserPlus, label: 'Friends', connectedOnly: true },
   { to: '/rules', icon: faBook, label: 'Guide', connectedOnly: false },
 ] as const
 

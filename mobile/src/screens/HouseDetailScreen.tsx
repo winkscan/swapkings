@@ -103,7 +103,7 @@ export function HouseDetailScreen({ route, navigation }: Props) {
               <FontAwesome6 name={inAGuild ? 'arrows-rotate' : 'door-open'} size={size * 0.85} color={color} />
             )}
           >
-            {inAGuild ? 'Switch to this House' : 'Join House'}
+            {inAGuild ? 'Switch to this Crew' : 'Join Crew'}
           </Button>
         )}
 
@@ -134,7 +134,7 @@ export function HouseDetailScreen({ route, navigation }: Props) {
         {feesLoading && feeRows.length === 0 ? (
           <ActivityIndicator style={styles.loading} />
         ) : feeRows.length === 0 ? (
-          <Text style={styles.dim}>No house-fee transactions yet.</Text>
+          <Text style={styles.dim}>No crew-fee transactions yet.</Text>
         ) : (
           feeRows.map((r) => (
             <TouchableRipple

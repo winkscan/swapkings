@@ -86,7 +86,7 @@ export function HousesScreen() {
     return (
       <View style={styles.center}>
         <Text variant="titleMedium" style={styles.mb}>
-          Connect your wallet to join a House
+          Connect your wallet to join a Crew
         </Text>
         <Button
           mode="contained"
@@ -109,7 +109,7 @@ export function HousesScreen() {
         <TextInput
           mode="outlined"
           dense
-          placeholder="Search your house"
+          placeholder="Search your crew"
           autoCapitalize="none"
           autoCorrect={false}
           value={search}
@@ -139,7 +139,7 @@ export function HousesScreen() {
           icon={({ size, color }) => <FontAwesome6 name="plus" size={size * 0.8} color={color} />}
           onPress={() => setAddVisible(true)}
         >
-          Add House
+          Add Crew
         </Button>
       </View>
 
@@ -165,7 +165,7 @@ export function HousesScreen() {
           loading ? (
             <ActivityIndicator style={styles.loading} />
           ) : (
-            <Text style={styles.loading}>No Houses found right now.</Text>
+            <Text style={styles.loading}>No Crews found right now.</Text>
           )
         }
         onRefresh={refresh}
@@ -248,7 +248,7 @@ function CurrentHouseHighlight({ row }: { row: GuildRow }) {
         <View style={styles.highlightBottomRow}>
           <View style={styles.highlightHouseRow}>
             <FontAwesome6 name="crown" size={11} color="#000000" />
-            <Text style={styles.highlightHouseText}>Your house</Text>
+            <Text style={styles.highlightHouseText}>Your crew</Text>
           </View>
           <View style={styles.statsInline}>
             <FontAwesome6 name="users" size={11} color={C.textSecondary} />

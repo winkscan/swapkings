@@ -74,9 +74,9 @@ function FeeSplitTable() {
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tableScroll}>
       <View>
         <View style={[styles.row, styles.headRow]}>
-          <Text style={[styles.cell, styles.headCell, styles.colHouse]}>In a house?</Text>
+          <Text style={[styles.cell, styles.headCell, styles.colHouse]}>In a crew?</Text>
           <Text style={[styles.cell, styles.headCell, styles.colReferred]}>Referred?</Text>
-          <Text style={[styles.cell, styles.headCell, styles.colWide]}>House founder</Text>
+          <Text style={[styles.cell, styles.headCell, styles.colWide]}>Crew founder</Text>
           <Text style={[styles.cell, styles.headCell, styles.colWide]}>Referrer</Text>
           <Text style={[styles.cell, styles.headCell, styles.colWide]}>Platform</Text>
         </View>
@@ -131,7 +131,7 @@ export function GuideScreen() {
         How It Works
       </Text>
       <Text style={styles.subtitle}>
-        Fees, Rank, Houses, and Friends — the mechanics behind SwapKings.
+        Fees, Rank, Crews, and Friends — the mechanics behind SwapKings.
       </Text>
 
       <GuideSection
@@ -146,7 +146,7 @@ export function GuideScreen() {
           founder sees nothing unless that exact token gets traded.
         </P>
         <P>
-          SwapKings breaks that link. Join a project's house, and{' '}
+          SwapKings breaks that link. Join a project's crew, and{' '}
           <Bold>
             up to 90% of your platform fee flows to that founder on every swap you make anywhere
             on SwapKings
@@ -158,14 +158,14 @@ export function GuideScreen() {
       </GuideSection>
 
       <GuideSection
-        icon="shield"
-        title="Houses"
+        icon="people-group"
+        title="Crews"
         expanded={expanded.has('houses')}
         onToggle={() => toggle('houses')}
       >
         <P>
           Any token launched on a qualifying launchpad, above a{' '}
-          {formatUsdCompact(GUILD_MARKET_CAP_FLOOR_USD)} market cap, has its own house. Joining is
+          {formatUsdCompact(GUILD_MARKET_CAP_FLOOR_USD)} market cap, has its own crew. Joining is
           free and instant — no invite needed, no cost beyond the swap you were already making.
           Once you've joined, <Bold>up to 90% of your platform fee on every swap you make anywhere
           on SwapKings</Bold> — not just swaps involving that token — routes straight to that
@@ -181,26 +181,26 @@ export function GuideScreen() {
             We only ever route real money to a wallet we can verify is a token's actual creator —
             confirmed automatically through the token's own on-chain launch data, never a manual
             list. A token from any other launchpad, or a plain wallet-to-wallet token with no
-            fair-launch record, can't become a house — there's no creator wallet we could safely
+            fair-launch record, can't become a crew — there's no creator wallet we could safely
             trust to route fees to. More launchpads may be added later, always following the same
             verification bar.
           </Text>
         </View>
         <P>
-          A house is sticky: it stays your active house across every future swap until you switch
+          A crew is sticky: it stays your active crew across every future swap until you switch
           to a different one or leave. Founders don't have to do anything to "activate" this — a
-          house's founder wallet comes straight from public launchpad creator data the moment
+          crew's founder wallet comes straight from public launchpad creator data the moment
           their token clears the market-cap floor.
         </P>
         <P>
-          SwapKings doesn't create a house — it's just an existing token, already launched and
+          SwapKings doesn't create a crew — it's just an existing token, already launched and
           already trading on its own, that we attach fee-routing to. We don't mint anything, don't
           touch the token's supply or liquidity, and don't run its chart or its community. All a
-          house really is: SwapKings linking swappers to a token's real creator wallet and sending
+          crew really is: SwapKings linking swappers to a token's real creator wallet and sending
           a share of platform fees there, automatically, for as long as they're in it.
         </P>
         <Text style={styles.pLast}>
-          Check the Houses page for the full list, each house's member count, and how much it's
+          Check the Crews page for the full list, each crew's member count, and how much it's
           earned so far.
         </Text>
       </GuideSection>
@@ -219,8 +219,8 @@ export function GuideScreen() {
         <P>
           Your Rank tier (see below) discounts that fee automatically, up to 50% off at the top
           tier — capped there on purpose, so there's always a real remainder left to split with a
-          house and/or referrer, no matter how high your own tier climbs. Whatever's left after
-          your discount is then split, instantly, depending on whether you're in a house and/or
+          crew and/or referrer, no matter how high your own tier climbs. Whatever's left after
+          your discount is then split, instantly, depending on whether you're in a crew and/or
           were referred:
         </P>
         <FeeSplitTable />
@@ -263,11 +263,11 @@ export function GuideScreen() {
           connecting a wallet isn't enough on its own.
         </P>
         <Text style={styles.pLast}>
-          You always earn the same 50% of your friend's fee, whether or not they're in a house —
-          bringing a friend along is worth the same either way. If they're not in a house, that's
-          50% you / 50% SwapKings. If they're also in a house, the split becomes 50% you / 40% the
-          house's founder / 10% SwapKings — your share never drops just because they joined a
-          house too. See the fee table above for the full breakdown. Get your own link from the
+          You always earn the same 50% of your friend's fee, whether or not they're in a crew —
+          bringing a friend along is worth the same either way. If they're not in a crew, that's
+          50% you / 50% SwapKings. If they're also in a crew, the split becomes 50% you / 40% the
+          crew's founder / 10% SwapKings — your share never drops just because they joined a
+          crew too. See the fee table above for the full breakdown. Get your own link from the
           "Invite friends" card on the Swap page.
         </Text>
       </GuideSection>
@@ -280,7 +280,7 @@ export function GuideScreen() {
       >
         <P>
           SwapKings runs entirely on-chain as a Solana program. There's no backend server holding
-          your funds or deciding outcomes — every swap, fee split, and house membership happens
+          your funds or deciding outcomes — every swap, fee split, and crew membership happens
           through public, verifiable on-chain instructions, the same ones for every wallet.
         </P>
         <Text style={styles.pLast}>

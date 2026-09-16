@@ -4,7 +4,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { NATIVE_MINT, getAssociatedTokenAddressSync } from '@solana/spl-token'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowsUpDown, faArrowRight, faChevronDown, faCircleCheck, faCircleXmark, faShield } from '@fortawesome/free-solid-svg-icons'
+import { faArrowsUpDown, faArrowRight, faChevronDown, faCircleCheck, faCircleXmark, faPeopleGroup } from '@fortawesome/free-solid-svg-icons'
 import { getQuote, PLATFORM_FEE_BPS, MIN_FEE_AMOUNT, type QuoteResponse } from './jupiter'
 import { getTokenInfos, getUsdPrices } from './jupiterInfo'
 import { getTokenInfoBatched } from './tokenInfoBatch'
@@ -584,7 +584,7 @@ export function SwapPanel() {
                 <TokenBadge mint={swapResult.outMint} flat iconOnly size={14} />
                 <span style={{ fontWeight: 600 }}>{swapResult.guildFounderAmount}</span>
                 <span className="text-secondary">went to the</span>
-                <FontAwesomeIcon icon={faShield} className="text-secondary" />
+                <FontAwesomeIcon icon={faPeopleGroup} className="text-secondary" />
                 <span style={{ fontWeight: 600 }}>{guildFounderSymbol}</span>
                 <span className="text-secondary">token founder</span>
               </div>

@@ -80,7 +80,7 @@ export function SwapResultOverlay({
             <TokenIcon option={outToken!} size={14} />
             <Text style={styles.guildAmount}>{guildFounderAmount}</Text>
             <Text style={styles.dim}>went to the</Text>
-            <FontAwesome6 name="shield" size={12} color={C.textSecondary} />
+            <FontAwesome6 name="people-group" size={12} color={C.textSecondary} />
             <Text style={styles.guildAmount}>{guildToken.symbol}</Text>
             <Text style={styles.dim}>token founder</Text>
           </View>

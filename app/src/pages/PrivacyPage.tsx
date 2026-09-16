@@ -48,7 +48,7 @@ export function PrivacyPage() {
       <Section icon={faDatabase} title="What we actually store">
         <p style={{ margin: 0, marginBottom: 8 }}>
           Our on-chain program records, per wallet address: cumulative swap volume (for your LUCK
-          tier), your current House, and your referrer if you have one. All of this is public Solana
+          tier), your current Crew, and your referrer if you have one. All of this is public Solana
           blockchain data — it isn't private, and it isn't stored anywhere off-chain by us beyond
           what the blockchain itself already keeps.
         </p>
