@@ -300,7 +300,7 @@ export function GuideScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { padding: 16, paddingBottom: 32 },
+  content: { padding: 20, paddingBottom: 32 },
   h1: { color: C.textPrimary, textAlign: 'center', marginBottom: 6 },
   subtitle: { color: C.textSecondary, fontSize: 13, textAlign: 'center', marginBottom: 20 },
 
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: C.border,
-    marginBottom: 12,
+    marginBottom: 20,
     overflow: 'hidden',
   },
   accordionHeader: { backgroundColor: C.bgElevated, paddingVertical: 2 },

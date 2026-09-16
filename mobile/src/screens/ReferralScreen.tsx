@@ -176,10 +176,10 @@ export function ReferralScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, paddingBottom: 48 },
+  container: { padding: 20, paddingBottom: 48 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   mb: { marginBottom: 16, textAlign: 'center' },
-  card: { marginBottom: 12 },
+  card: { marginBottom: 20 },
   dim: { opacity: 0.7, marginTop: 4 },
   link: { color: SWAPKINGS_COLORS.accent, marginVertical: 10 },
   rowBtns: { flexDirection: 'row', gap: 10 },

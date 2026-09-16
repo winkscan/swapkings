@@ -21,7 +21,7 @@ export function SettingsScreen() {
 const styles = StyleSheet.create({
   screenContainer: {
     height: "100%",
-    padding: 16,
+    padding: 20,
     flex: 1,
   },
   title: {

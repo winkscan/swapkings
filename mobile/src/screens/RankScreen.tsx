@@ -114,7 +114,7 @@ export function RankScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, paddingBottom: 48 },
+  container: { padding: 20, paddingBottom: 48 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   mb: { marginBottom: 16, textAlign: 'center' },
   card: { backgroundColor: C.bgElevated, borderRadius: 20, padding: 16 },
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   barFill: { height: '100%', borderRadius: 3, backgroundColor: C.positive },
   barLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-  tiersCard: { marginTop: 16 },
+  tiersCard: { marginTop: 20 },
   tiersTitle: { color: C.textPrimary, fontWeight: '700' },
   tiersSubtitle: { color: C.textSecondary, marginTop: 4, marginBottom: 16 },
   headerRow: {

@@ -363,15 +363,15 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   mb: { marginBottom: 16, textAlign: 'center' },
-  stickyHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, margin: 12, marginBottom: 10 },
-  list: { padding: 12, paddingTop: 0 },
+  stickyHeader: { flexDirection: 'row', alignItems: 'center', gap: 20, margin: 20, marginBottom: 20 },
+  list: { paddingHorizontal: 20, paddingBottom: 20 },
   dim: { opacity: 0.7 },
-  err: { marginHorizontal: 12 },
+  err: { marginHorizontal: 20 },
   loading: { textAlign: 'center', marginTop: 32, opacity: 0.7 },
   errorText: { color: C.negative },
   statsInline: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 
-  highlightTouch: { borderRadius: 20, marginBottom: 10, overflow: 'hidden' },
+  highlightTouch: { borderRadius: 20, marginBottom: 20, overflow: 'hidden' },
   highlight: {
     backgroundColor: '#ffffff',
     borderRadius: 20,
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   highlightHouseText: { color: '#000000', fontSize: 12, fontWeight: '600' },
   highlightMembers: { color: C.textSecondary, fontSize: 12 },
 
-  houseCardTouch: { borderRadius: 20, marginBottom: 10, overflow: 'hidden' },
+  houseCardTouch: { borderRadius: 20, marginBottom: 20, overflow: 'hidden' },
   houseCard: { backgroundColor: C.bgElevated },
   houseCardBadge: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   houseCardSymbol: { color: C.textPrimary, fontWeight: '700', fontSize: 16 },
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: C.bgElevated,
     borderRadius: 20,
-    padding: 16,
+    padding: 20,
     marginHorizontal: 20,
   },
   addTitle: { color: C.textPrimary, marginBottom: 10 },

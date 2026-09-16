@@ -457,7 +457,7 @@ export function SwapScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: C.bg },
-  container: { padding: 16, paddingBottom: 24 },
+  container: { padding: 20, paddingBottom: 24 },
   panel: {
     backgroundColor: C.bgElevated,
     borderRadius: 20,
