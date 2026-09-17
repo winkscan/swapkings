@@ -2,6 +2,7 @@ import React from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
+import { LinearGradient } from 'expo-linear-gradient'
 
 import { useAuthorization } from '../utils/useAuthorization'
 import { useMobileWallet } from '../utils/useMobileWallet'
@@ -78,7 +79,12 @@ export function RankScreen() {
         </View>
 
         <View style={styles.barTrack}>
-          <View style={[styles.barFill, { width: `${stageProgressPct}%` }]} />
+          <LinearGradient
+            colors={['#F5C518', C.positive]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.barFill, { width: `${stageProgressPct}%` }]}
+          />
         </View>
         <View style={styles.barLabels}>
           <Text variant="bodySmall" style={styles.dim}>
@@ -139,7 +145,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginTop: 16,
   },
-  barFill: { height: '100%', borderRadius: 3, backgroundColor: C.positive },
+  barFill: { height: '100%', borderRadius: 3, overflow: 'hidden' },
   barLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
   tiersCard: { marginTop: 20 },
   tiersTitle: { color: C.textPrimary, fontWeight: '700' },
