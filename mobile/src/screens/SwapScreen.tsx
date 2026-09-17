@@ -429,6 +429,7 @@ export function SwapScreen() {
               value={customMint!.mint}
               onChangeText={(v) => setCustomMint({ side: 'sell', mint: v })}
               style={styles.mintInput}
+              outlineStyle={styles.mintInputOutline}
             />
           ) : null}
           <View style={styles.subRow}>
@@ -480,6 +481,7 @@ export function SwapScreen() {
               value={customMint!.mint}
               onChangeText={(v) => setCustomMint({ side: 'buy', mint: v })}
               style={styles.mintInput}
+              outlineStyle={styles.mintInputOutline}
             />
           ) : null}
           <View style={styles.subRow}>
@@ -573,7 +575,10 @@ const styles = StyleSheet.create({
   },
   maxBtnText: { color: C.textSecondary, fontSize: 11, fontWeight: '700' },
   dim: { color: C.textSecondary },
-  mintInput: { marginTop: 8, backgroundColor: 'transparent' },
+  // Same height/radius as the Crews page's own search field (Alexey's
+  // explicit ask 2026-09-18) — one text-input style standard across the app.
+  mintInput: { marginTop: 8, height: 40, backgroundColor: 'transparent' },
+  mintInputOutline: { borderRadius: 16 },
   flipRow: { alignItems: 'center', marginVertical: -14, zIndex: 1 },
   flipButton: {
     backgroundColor: C.bgHover,
