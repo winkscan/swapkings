@@ -11,6 +11,7 @@ import { useSwapkings } from '../swapkings/useSwapkings'
 import type { QuoteResponse } from '../swapkings/jupiter'
 import { getTokenInfos } from '../swapkings/jupiterInfo'
 import { getTokenProgramId } from '../swapkings/tokenProgram'
+import { getWalletTokens, type WalletToken } from '../swapkings/walletTokens'
 import { friendlyErrorMessage, wasCancelled } from '../swapkings/walletErrors'
 import { resolvePendingReferrer } from '../swapkings/referral'
 import { fromRawUnits, shortAddr, toRawUnits } from '../swapkings/format'
@@ -38,7 +39,10 @@ export function SwapScreen() {
 
   const [sellKey, setSellKey] = useState('SOL')
   const [buyKey, setBuyKey] = useState('USDC')
-  const [customMint, setCustomMint] = useState<{ side: 'sell' | 'buy'; mint: string } | null>(
+  // `symbol` is only ever set when selecting a wallet-held token from the
+  // picker (its real symbol is already known then) — a hand-typed mint
+  // still falls back to shortAddr, same as before.
+  const [customMint, setCustomMint] = useState<{ side: 'sell' | 'buy'; mint: string; symbol?: string } | null>(
     null,
   )
   const [customDecimals, setCustomDecimals] = useState<number | null>(null)
@@ -72,8 +76,8 @@ export function SwapScreen() {
   const outputMint = buyIsCustom ? customMint!.mint : PRESETS[buyKey].mint
   const outputDecimals = buyIsCustom ? customDecimals : PRESETS[buyKey].decimals
 
-  const sellSymbol = sellIsCustom ? shortAddr(customMint!.mint) : sellKey
-  const buySymbol = buyIsCustom ? shortAddr(customMint!.mint) : buyKey
+  const sellSymbol = sellIsCustom ? customMint!.symbol || shortAddr(customMint!.mint) : sellKey
+  const buySymbol = buyIsCustom ? customMint!.symbol || shortAddr(customMint!.mint) : buyKey
 
   // Fetch icons for the 4 presets once, and for whichever mint is currently
   // pasted as custom — purely cosmetic (TokenPill falls back to a plain
@@ -143,6 +147,31 @@ export function SwapScreen() {
       cancelled = true
     }
   }, [connection, selectedAccount, inputMint, inputDecimals])
+
+  // Wallet-held tokens, so the picker can show "what's actually in your
+  // wallet" (with balance) alongside the fixed preset list, not just those
+  // 4 tokens (user feedback, 2026-09-17).
+  const [walletTokens, setWalletTokens] = useState<WalletToken[]>([])
+  useEffect(() => {
+    if (!selectedAccount) {
+      setWalletTokens([])
+      return
+    }
+    let cancelled = false
+    getWalletTokens(connection, selectedAccount.publicKey)
+      .then((tokens) => {
+        if (!cancelled) setWalletTokens(tokens)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [connection, selectedAccount])
+  const walletBalanceByMint = useMemo(() => {
+    const m: Record<string, number> = {}
+    for (const t of walletTokens) m[t.mint] = t.uiAmount
+    return m
+  }, [walletTokens])
 
   const rawAmount = toRawUnits(amount, inputDecimals ?? 0)
   const canQuote =
@@ -220,13 +249,58 @@ export function SwapScreen() {
     setQuoteResp(null)
   }, [sellKey, buyKey, customMint])
 
-  const sellOptions: TokenOption[] = PRESET_KEYS.map((k) => ({
-    key: k,
-    symbol: k,
-    icon: icons[PRESETS[k].mint],
-    mint: PRESETS[k].mint,
-  }))
+  // Presets first (stable, known-safe order), then whatever else the wallet
+  // actually holds — each with its real balance shown gray in the picker
+  // (see TokenPill.tsx's own `balance` field).
+  const presetMints = useMemo(() => new Set(PRESET_KEYS.map((k) => PRESETS[k].mint)), [])
+  const walletExtras: TokenOption[] = walletTokens
+    .filter((t) => !presetMints.has(t.mint))
+    .map((t) => ({
+      key: t.mint,
+      symbol: t.symbol || shortAddr(t.mint),
+      icon: t.icon,
+      mint: t.mint,
+      balance: t.uiAmount,
+    }))
+  const sellOptions: TokenOption[] = [
+    ...PRESET_KEYS.map((k) => ({
+      key: k,
+      symbol: k,
+      icon: icons[PRESETS[k].mint],
+      mint: PRESETS[k].mint,
+      balance: walletBalanceByMint[PRESETS[k].mint],
+    })),
+    ...walletExtras,
+  ]
   const buyOptions = sellOptions
+
+  // A wallet-extra row's key is its mint (not a PRESETS key) — selecting one
+  // routes through the same "custom mint" path the paste-a-mint flow already
+  // uses, which is what resolves its decimals.
+  const selectSell = useCallback(
+    (k: string) => {
+      if (PRESETS[k]) {
+        setSellKey(k)
+        if (sellIsCustom) setCustomMint(null)
+      } else {
+        const symbol = walletTokens.find((t) => t.mint === k)?.symbol
+        setCustomMint({ side: 'sell', mint: k, symbol })
+      }
+    },
+    [sellIsCustom, walletTokens],
+  )
+  const selectBuy = useCallback(
+    (k: string) => {
+      if (PRESETS[k]) {
+        setBuyKey(k)
+        if (buyIsCustom) setCustomMint(null)
+      } else {
+        const symbol = walletTokens.find((t) => t.mint === k)?.symbol
+        setCustomMint({ side: 'buy', mint: k, symbol })
+      }
+    },
+    [buyIsCustom, walletTokens],
+  )
 
   const onSwap = useCallback(async () => {
     if (!quoteResp || outputDecimals == null) return
@@ -331,10 +405,7 @@ export function SwapScreen() {
             <TokenPill
               selected={{ key: sellKey, symbol: sellSymbol, icon: icons[inputMint], mint: inputMint }}
               options={sellOptions}
-              onSelect={(k) => {
-                setSellKey(k)
-                if (sellIsCustom) setCustomMint(null)
-              }}
+              onSelect={selectSell}
               onCustom={() => setCustomMint({ side: 'sell', mint: '' })}
             />
           </View>
@@ -354,9 +425,16 @@ export function SwapScreen() {
             <Text variant="bodySmall" style={styles.dim}>
               {quoting ? 'Fetching quote…' : ' '}
             </Text>
-            <Text variant="bodySmall" style={styles.dim}>
-              Balance: {inputBalance != null ? inputBalance.toFixed(4) : '—'}
-            </Text>
+            <View style={styles.balanceRow}>
+              {inputBalance != null && inputBalance > 0 ? (
+                <TouchableRipple style={styles.maxBtn} onPress={() => onPercent(1)} borderless>
+                  <Text style={styles.maxBtnText}>MAX</Text>
+                </TouchableRipple>
+              ) : null}
+              <Text variant="bodySmall" style={styles.dim}>
+                Balance: {inputBalance != null ? inputBalance.toFixed(4) : '—'}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -377,10 +455,7 @@ export function SwapScreen() {
             <TokenPill
               selected={{ key: buyKey, symbol: buySymbol, icon: icons[outputMint], mint: outputMint }}
               options={buyOptions}
-              onSelect={(k) => {
-                setBuyKey(k)
-                if (buyIsCustom) setCustomMint(null)
-              }}
+              onSelect={selectBuy}
               onCustom={() => setCustomMint({ side: 'buy', mint: '' })}
             />
           </View>
@@ -476,6 +551,16 @@ const styles = StyleSheet.create({
   amountText: { color: C.textPrimary, fontWeight: '600', flexShrink: 1 },
   amountTextDim: { color: C.textSecondary, fontWeight: '600', flexShrink: 1 },
   subRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
+  balanceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  maxBtn: {
+    backgroundColor: C.bgHover,
+    borderWidth: 1,
+    borderColor: C.borderStrong,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+  },
+  maxBtnText: { color: C.textSecondary, fontSize: 11, fontWeight: '700' },
   dim: { color: C.textSecondary },
   mintInput: { marginTop: 8, backgroundColor: 'transparent' },
   flipRow: { alignItems: 'center', marginVertical: -14, zIndex: 1 },

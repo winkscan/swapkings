@@ -4,12 +4,17 @@ import { Menu, Text, TouchableRipple } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { SWAPKINGS_COLORS } from "../theme";
 import { dexscreenerIconUrl } from "../swapkings/jupiterInfo";
+import { formatTokenAmountCompact } from "../swapkings/format";
 
 export interface TokenOption {
   key: string;
   symbol: string;
   icon?: string;
   mint?: string;
+  // Wallet-held amount, shown gray next to the row in the picker so you can
+  // see what you actually hold instead of only the fixed preset list (user
+  // feedback, 2026-09-17). Not set on `selected` — only options list rows.
+  balance?: number;
 }
 
 // The token selector "pill" from the reference (icon + symbol + chevron,
@@ -52,6 +57,15 @@ export function TokenPill({
           }}
           title={o.symbol}
           leadingIcon={() => <TokenIcon option={o} size={20} />}
+          trailingIcon={
+            o.balance
+              ? () => (
+                  <Text style={styles.balance} numberOfLines={1}>
+                    {formatTokenAmountCompact(o.balance!)}
+                  </Text>
+                )
+              : undefined
+          }
         />
       ))}
       <Menu.Item
@@ -119,4 +133,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   fallbackLetter: { color: SWAPKINGS_COLORS.textSecondary, fontWeight: "700", fontSize: 11 },
+  balance: { color: SWAPKINGS_COLORS.textSecondary, fontSize: 12 },
 });

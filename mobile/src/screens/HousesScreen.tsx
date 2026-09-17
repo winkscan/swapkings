@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   houseCard: { backgroundColor: C.bgElevated },
   houseCardBadge: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   houseCardSymbol: { color: C.textPrimary, fontWeight: '700', fontSize: 16 },
-  houseCardFee: { color: C.positive, fontWeight: '700', fontSize: 16 },
+  houseCardFee: { color: C.textPrimary, fontWeight: '700', fontSize: 16 },
   houseCardSubText: { color: C.textSecondary, fontSize: 12 },
 
   searchInput: { flex: 1, height: 40, backgroundColor: 'transparent' },
