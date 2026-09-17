@@ -1,4 +1,5 @@
 import { StyleSheet, View } from "react-native";
+import type { ReactNode } from "react";
 import { Menu, TouchableRipple } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Account, useAuthorization } from "../../utils/useAuthorization";
@@ -32,6 +33,17 @@ export function TopBarWalletButton({
         {selectedAccount ? <View style={styles.connectedDot} /> : null}
       </View>
     </TouchableRipple>
+  );
+}
+
+// Paper's Menu.Item wraps a function leadingIcon in a box that stretches to
+// the row's height but never centers its own content vertically (only the
+// title text gets `justifyContent: 'center'` — see MenuItem.tsx) — a real
+// misalignment confirmed live 2026-09-17. Centering here, inside the icon's
+// own render, fixes it without touching the library.
+function centeredMenuIcon(icon: ReactNode) {
+  return () => (
+    <View style={styles.menuIconWrap}>{icon}</View>
   );
 }
 
@@ -75,13 +87,13 @@ export function TopBarWalletMenu() {
       <Menu.Item
         onPress={copyAddressToClipboard}
         title="Copy address"
-        leadingIcon={() => <FontAwesome6 name="copy" size={16} color={C.textPrimary} />}
+        leadingIcon={centeredMenuIcon(<FontAwesome6 name="copy" size={16} color={C.textPrimary} />)}
       />
       <Menu.Item
         onPress={viewExplorer}
         title="View Explorer"
-        leadingIcon={() => (
-          <FontAwesome6 name="up-right-from-square" size={16} color={C.textPrimary} />
+        leadingIcon={centeredMenuIcon(
+          <FontAwesome6 name="up-right-from-square" size={16} color={C.textPrimary} />,
         )}
       />
       <Menu.Item
@@ -90,7 +102,7 @@ export function TopBarWalletMenu() {
           navigation.navigate("Settings" as never);
         }}
         title="Network"
-        leadingIcon={() => <FontAwesome6 name="tower-broadcast" size={16} color={C.textPrimary} />}
+        leadingIcon={centeredMenuIcon(<FontAwesome6 name="tower-broadcast" size={16} color={C.textPrimary} />)}
       />
       <Menu.Item
         onPress={async () => {
@@ -98,7 +110,7 @@ export function TopBarWalletMenu() {
           closeMenu();
         }}
         title="Disconnect"
-        leadingIcon={() => <FontAwesome6 name="link-slash" size={16} color={C.textPrimary} />}
+        leadingIcon={centeredMenuIcon(<FontAwesome6 name="link-slash" size={16} color={C.textPrimary} />)}
       />
     </Menu>
   );
@@ -123,5 +135,10 @@ const styles = StyleSheet.create({
     backgroundColor: C.positive,
     borderWidth: 1.5,
     borderColor: C.bgElevated,
+  },
+  menuIconWrap: {
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
