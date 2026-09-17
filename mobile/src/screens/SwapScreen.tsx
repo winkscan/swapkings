@@ -548,8 +548,8 @@ const styles = StyleSheet.create({
     marginTop: 6,
     gap: 12,
   },
-  amountText: { color: C.textPrimary, fontWeight: '600', flexShrink: 1 },
-  amountTextDim: { color: C.textSecondary, fontWeight: '600', flexShrink: 1 },
+  amountText: { color: C.textPrimary, fontWeight: '600', flex: 1 },
+  amountTextDim: { color: C.textSecondary, fontWeight: '600', flex: 1 },
   subRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
   balanceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   maxBtn: {

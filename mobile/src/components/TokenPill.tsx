@@ -122,11 +122,12 @@ const styles = StyleSheet.create({
   pill: {
     backgroundColor: SWAPKINGS_COLORS.bgHover,
     borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    minWidth: 116,
   },
-  pillContent: { flexDirection: "row", alignItems: "center", gap: 6 },
-  symbol: { color: SWAPKINGS_COLORS.textPrimary, fontWeight: "600" },
+  pillContent: { flexDirection: "row", alignItems: "center", gap: 8 },
+  symbol: { color: SWAPKINGS_COLORS.textPrimary, fontWeight: "600", lineHeight: 22 },
   fallbackIcon: {
     backgroundColor: SWAPKINGS_COLORS.bgHover,
     alignItems: "center",
