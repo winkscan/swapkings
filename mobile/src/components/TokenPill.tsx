@@ -24,11 +24,18 @@ export function TokenPill({
   options,
   onSelect,
   onCustom,
+  menuWidth,
 }: {
   selected: TokenOption;
   options: TokenOption[];
   onSelect: (key: string) => void;
   onCustom: () => void;
+  // Widens the opened dropdown to roughly the panel's own content width
+  // (Alexey's explicit ask 2026-09-17, annotated screenshot: the popup
+  // should span from about where "SELL" sits to the panel's right edge,
+  // not stay pill-width). Paper's Menu clamps itself back on screen if this
+  // would overflow, so it's safe to just ask for the wide size.
+  menuWidth?: number;
 }) {
   const [visible, setVisible] = useState(false);
 
@@ -36,6 +43,7 @@ export function TokenPill({
     <Menu
       visible={visible}
       onDismiss={() => setVisible(false)}
+      contentStyle={menuWidth ? { width: menuWidth } : undefined}
       anchor={
         <TouchableRipple style={styles.pill} onPress={() => setVisible(true)} borderless>
           <View style={styles.pillContent}>

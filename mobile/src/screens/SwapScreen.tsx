@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
 import { Button, HelperText, Text, TextInput, TouchableRipple } from 'react-native-paper'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import { PublicKey } from '@solana/web3.js'
@@ -31,6 +31,11 @@ const PRESETS: Record<string, { mint: string; decimals: number }> = {
 const PRESET_KEYS = Object.keys(PRESETS)
 // Reserved so a MAX sell of SOL still leaves enough for network/rent fees.
 const SOL_FEE_RESERVE = 0.003
+// Panel's own content width (screen width minus the container's 20px side
+// padding and the panel's own 16px padding, both sides) — the token dropdown
+// opens at roughly this width, spanning from the SELL/BUY label to the
+// panel's right edge (app is portrait-locked, so this is stable).
+const TOKEN_MENU_WIDTH = Dimensions.get('window').width - 2 * 20 - 2 * 16
 
 export function SwapScreen() {
   const { selectedAccount } = useAuthorization()
@@ -407,6 +412,7 @@ export function SwapScreen() {
               options={sellOptions}
               onSelect={selectSell}
               onCustom={() => setCustomMint({ side: 'sell', mint: '' })}
+              menuWidth={TOKEN_MENU_WIDTH}
             />
           </View>
           {sellIsCustom ? (
@@ -457,6 +463,7 @@ export function SwapScreen() {
               options={buyOptions}
               onSelect={selectBuy}
               onCustom={() => setCustomMint({ side: 'buy', mint: '' })}
+              menuWidth={TOKEN_MENU_WIDTH}
             />
           </View>
           {buyIsCustom ? (
