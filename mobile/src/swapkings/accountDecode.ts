@@ -76,6 +76,7 @@ export interface RawPlayerStats {
   currentGuildFounderWallet: PublicKey
   referrer: PublicKey
   myReferralCode: number[]
+  earnedForReferrerUsdE4: number
 }
 
 // Offsets from the start of the account (discriminator included) — verified
@@ -94,6 +95,7 @@ export function decodePlayerStats(data: Buffer): RawPlayerStats {
     currentGuildFounderWallet: readPubkey(data, 80),
     referrer: readPubkey(data, 112),
     myReferralCode: Array.from(data.subarray(144, 151)),
+    earnedForReferrerUsdE4: readU64LE(data, 152),
   }
 }
 
