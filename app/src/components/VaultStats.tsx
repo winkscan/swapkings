@@ -41,7 +41,7 @@ export function VaultStats() {
             style={{ fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 6 }}
           >
             <FontAwesomeIcon icon={faHandHoldingDollar} />
-            Fees Shared
+            Fees Routed
           </div>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--positive)' }}>
             {guildsLoading ? '…' : formatUsdCompact(totalFeesShared)}

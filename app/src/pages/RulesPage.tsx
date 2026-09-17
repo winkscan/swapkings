@@ -110,8 +110,8 @@ export function RulesPage() {
           share of platform fees there, automatically, for as long as they're in it.
         </p>
         <p style={{ margin: 0 }}>
-          Check the Crews page for the full list, each crew's member count, and how much it's
-          earned so far.
+          Check the Crews page for the full list, each crew's member count, and how much has
+          been routed to it so far.
         </p>
       </Section>
 

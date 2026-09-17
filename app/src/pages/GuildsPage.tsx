@@ -587,7 +587,7 @@ export function GuildsPage() {
           Crews
         </button>
         <button className={tab === 'fees' ? 'active' : ''} onClick={() => setTab('fees')}>
-          Fees sent
+          Fees routed
         </button>
       </div>
 
@@ -657,8 +657,8 @@ export function GuildsPage() {
                         <th className="guild-table-optional-col">Members</th>
                         <th>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                            Fees sent
-                            <InfoTooltip text="These fees were sent directly to the token's founder wallet." />
+                            Fees routed
+                            <InfoTooltip text="These fees were routed directly to the token's founder wallet." />
                           </span>
                         </th>
                         <th></th>

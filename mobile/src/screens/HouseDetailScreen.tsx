@@ -133,7 +133,7 @@ export function HouseDetailScreen({ route, navigation }: Props) {
             <Text style={styles.statValue}>{formatUsdCompact(row.totalFeesEarnedUsd)}</Text>
             <View style={styles.statLabelRow}>
               <FontAwesome6 name="hand-holding-dollar" size={12} color={C.textSecondary} />
-              <Text style={styles.statLabel}>Fees earned</Text>
+              <Text style={styles.statLabel}>Fees routed</Text>
             </View>
           </View>
         </View>

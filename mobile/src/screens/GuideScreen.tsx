@@ -200,8 +200,8 @@ export function GuideScreen() {
           a share of platform fees there, automatically, for as long as they're in it.
         </P>
         <Text style={styles.pLast}>
-          Check the Crews page for the full list, each crew's member count, and how much it's
-          earned so far.
+          Check the Crews page for the full list, each crew's member count, and how much has
+          been routed to it so far.
         </Text>
       </GuideSection>
 
