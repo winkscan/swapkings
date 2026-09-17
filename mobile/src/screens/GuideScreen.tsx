@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
-import { List, Text } from 'react-native-paper'
+import { Text, TouchableRipple } from 'react-native-paper'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
 import { GUILD_MARKET_CAP_FLOOR_USD } from '../swapkings/pumpfun'
@@ -36,6 +36,13 @@ function Bold({ children }: { children: React.ReactNode }) {
   return <Text style={styles.bold}>{children}</Text>
 }
 
+// Custom accordion, not react-native-paper's List.Accordion — its own
+// internal layout reserves a wide fixed slot for the `left` icon regardless
+// of our own wrapper's width/margin (confirmed live 2026-09-18, screenshot:
+// the icon sat right at the card edge with a big dead gap before the title
+// no matter what margin was set on it), and it also never actually rendered
+// expanded on first mount despite `expanded` being true from the very first
+// render. A plain row we own directly fixes both.
 function GuideSection({
   icon,
   title,
@@ -51,20 +58,20 @@ function GuideSection({
 }) {
   return (
     <View style={styles.card}>
-      <List.Accordion
-        title={title}
-        expanded={expanded}
-        onPress={onToggle}
-        left={() => (
-          <View style={styles.iconWrap}>
-            <FontAwesome6 name={icon} size={15} color={C.accent} />
+      <TouchableRipple onPress={onToggle} style={styles.accordionHeader}>
+        <View style={styles.accordionHeaderRow}>
+          <View style={styles.accordionHeaderLeft}>
+            <FontAwesome6 name={icon} size={16} color={C.accent} />
+            <Text style={styles.accordionTitle}>{title}</Text>
           </View>
-        )}
-        style={styles.accordionHeader}
-        titleStyle={styles.accordionTitle}
-      >
-        <View style={styles.body}>{children}</View>
-      </List.Accordion>
+          <FontAwesome6
+            name={expanded ? 'chevron-up' : 'chevron-down'}
+            size={14}
+            color={C.textSecondary}
+          />
+        </View>
+      </TouchableRipple>
+      {expanded ? <View style={styles.body}>{children}</View> : null}
     </View>
   )
 }
@@ -127,7 +134,7 @@ export function GuideScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text variant="headlineSmall" style={styles.h1}>
+      <Text variant="titleLarge" style={styles.h1}>
         How It Works
       </Text>
       <Text style={styles.subtitle}>
@@ -301,23 +308,22 @@ export function GuideScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 20, paddingBottom: 32 },
-  h1: { color: C.textPrimary, textAlign: 'center', marginBottom: 6 },
-  subtitle: { color: C.textSecondary, fontSize: 13, textAlign: 'center', marginBottom: 20 },
+  // Same size/weight as every other screen heading in the app (Rank's own
+  // "Rank tiers" title is the reference — MD3 titleLarge, 22px/700).
+  h1: { color: C.textPrimary, fontWeight: '700', textAlign: 'left', marginBottom: 6 },
+  subtitle: { color: C.textSecondary, fontSize: 13, textAlign: 'left', marginBottom: 20 },
 
   card: {
     backgroundColor: C.bgElevated,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: C.border,
     marginBottom: 20,
     overflow: 'hidden',
   },
-  accordionHeader: { backgroundColor: C.bgElevated, paddingVertical: 2 },
-  // Same size/weight as every other card heading in the app (Rank's own
-  // "Rank tiers" title is the reference — MD3 titleLarge, 22px/700).
+  accordionHeader: { paddingHorizontal: 20, paddingVertical: 16 },
+  accordionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  accordionHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   accordionTitle: { color: C.textPrimary, fontSize: 22, fontWeight: '700' },
-  iconWrap: { width: 24, alignItems: 'center', justifyContent: 'center', marginLeft: 4 },
-  body: { paddingHorizontal: 16, paddingBottom: 16 },
+  body: { paddingHorizontal: 20, paddingBottom: 20 },
 
   p: { color: C.textSecondary, fontSize: 14, lineHeight: 21, marginBottom: 10 },
   pLast: { color: C.textSecondary, fontSize: 14, lineHeight: 21 },
@@ -353,7 +359,7 @@ const styles = StyleSheet.create({
   disclaimer: {
     color: C.textTertiary,
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: 'left',
     marginTop: 8,
   },
 })
