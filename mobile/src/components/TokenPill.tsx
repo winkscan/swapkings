@@ -57,33 +57,51 @@ export function TokenPill({
       }
     >
       {options.map((o) => (
-        <Menu.Item
+        <TokenMenuRow
           key={o.key}
+          option={o}
           onPress={() => {
             setVisible(false);
             onSelect(o.key);
           }}
-          title={o.symbol}
-          leadingIcon={() => <TokenIcon option={o} size={20} />}
-          trailingIcon={
-            o.balance
-              ? () => (
-                  <Text style={styles.balance} numberOfLines={1}>
-                    {formatTokenAmountCompact(o.balance!)}
-                  </Text>
-                )
-              : undefined
-          }
         />
       ))}
-      <Menu.Item
+      <TouchableRipple
+        style={styles.menuRow}
         onPress={() => {
           setVisible(false);
           onCustom();
         }}
-        title="Paste a mint address…"
-      />
+      >
+        <Text style={styles.menuRowSymbol}>Paste a mint address…</Text>
+      </TouchableRipple>
     </Menu>
+  );
+}
+
+// A plain row, not react-native-paper's Menu.Item — its own MenuItem.tsx caps
+// every row at MAX_WIDTH=280 regardless of the surrounding Menu's own width,
+// and reserves a fixed 24px box for a trailingIcon (meant for a small glyph,
+// not a balance string), which clipped the balance to "0…." and left the
+// symbol/balance visibly off the same line (confirmed live 2026-09-17,
+// screenshot: content stopped well short of the now-wide dropdown's real
+// edge). A single flex row we own completely sidesteps both — `Menu`'s own
+// children render directly inside its Surface with no such wrapper.
+function TokenMenuRow({ option, onPress }: { option: TokenOption; onPress: () => void }) {
+  return (
+    <TouchableRipple style={styles.menuRow} onPress={onPress}>
+      <View style={styles.menuRowContent}>
+        <TokenIcon option={option} size={22} />
+        <Text style={styles.menuRowSymbol} numberOfLines={1}>
+          {option.symbol}
+        </Text>
+        {option.balance ? (
+          <Text style={styles.menuRowBalance} numberOfLines={1}>
+            {formatTokenAmountCompact(option.balance)}
+          </Text>
+        ) : null}
+      </View>
+    </TouchableRipple>
   );
 }
 
@@ -142,5 +160,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   fallbackLetter: { color: SWAPKINGS_COLORS.textSecondary, fontWeight: "700", fontSize: 11 },
-  balance: { color: SWAPKINGS_COLORS.textSecondary, fontSize: 12 },
+  menuRow: { paddingVertical: 12, paddingHorizontal: 16 },
+  menuRowContent: { flexDirection: "row", alignItems: "center", gap: 12 },
+  menuRowSymbol: { flex: 1, color: SWAPKINGS_COLORS.textPrimary, fontWeight: "600", fontSize: 16 },
+  menuRowBalance: { color: SWAPKINGS_COLORS.textSecondary, fontSize: 12, flexShrink: 0 },
 });
