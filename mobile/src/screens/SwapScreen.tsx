@@ -85,8 +85,16 @@ export function SwapScreen() {
   const outputMint = buyIsCustom ? customMint!.mint : PRESETS[buyKey].mint
   const outputDecimals = buyIsCustom ? customDecimals : PRESETS[buyKey].decimals
 
-  const sellSymbol = sellIsCustom ? customMint!.symbol || shortAddr(customMint!.mint) : sellKey
-  const buySymbol = buyIsCustom ? customMint!.symbol || shortAddr(customMint!.mint) : buyKey
+  // Before anything's actually pasted, customMint.mint is '' — shortAddr('')
+  // returns '' too, so the pill showed no text at all (just the chevron,
+  // confirmed live 2026-09-18). "Custom" is the placeholder until a real
+  // mint resolves a symbol.
+  const sellSymbol = sellIsCustom
+    ? customMint!.symbol || (customMint!.mint ? shortAddr(customMint!.mint) : 'Custom')
+    : sellKey
+  const buySymbol = buyIsCustom
+    ? customMint!.symbol || (customMint!.mint ? shortAddr(customMint!.mint) : 'Custom')
+    : buyKey
 
   // Fetch icons for the 4 presets once, and for whichever mint is currently
   // pasted as custom — purely cosmetic (TokenPill falls back to a plain
@@ -286,8 +294,15 @@ export function SwapScreen() {
   // A wallet-extra row's key is its mint (not a PRESETS key) — selecting one
   // routes through the same "custom mint" path the paste-a-mint flow already
   // uses, which is what resolves its decimals.
+  // Picking the same mint Buy already has (or vice versa) would leave both
+  // sides identical — not swappable, and Jupiter can't quote it anyway.
+  // Bumps the OTHER side to SOL (or USDC, if the new pick IS SOL) instead of
+  // just silently leaving a same-token pair on screen (Alexey's explicit ask
+  // 2026-09-18).
   const selectSell = useCallback(
     (k: string) => {
+      const newMint = PRESETS[k] ? PRESETS[k].mint : k
+      const collides = newMint === outputMint
       if (PRESETS[k]) {
         setSellKey(k)
         if (sellIsCustom) setCustomMint(null)
@@ -295,11 +310,17 @@ export function SwapScreen() {
         const symbol = walletTokens.find((t) => t.mint === k)?.symbol
         setCustomMint({ side: 'sell', mint: k, symbol })
       }
+      if (collides) {
+        setBuyKey(newMint === PRESETS.SOL.mint ? 'USDC' : 'SOL')
+        if (PRESETS[k] && buyIsCustom) setCustomMint(null)
+      }
     },
-    [sellIsCustom, walletTokens],
+    [outputMint, sellIsCustom, buyIsCustom, walletTokens],
   )
   const selectBuy = useCallback(
     (k: string) => {
+      const newMint = PRESETS[k] ? PRESETS[k].mint : k
+      const collides = newMint === inputMint
       if (PRESETS[k]) {
         setBuyKey(k)
         if (buyIsCustom) setCustomMint(null)
@@ -307,8 +328,12 @@ export function SwapScreen() {
         const symbol = walletTokens.find((t) => t.mint === k)?.symbol
         setCustomMint({ side: 'buy', mint: k, symbol })
       }
+      if (collides) {
+        setSellKey(newMint === PRESETS.SOL.mint ? 'USDC' : 'SOL')
+        if (PRESETS[k] && sellIsCustom) setCustomMint(null)
+      }
     },
-    [buyIsCustom, walletTokens],
+    [inputMint, buyIsCustom, sellIsCustom, walletTokens],
   )
 
   const onSwap = useCallback(async () => {
