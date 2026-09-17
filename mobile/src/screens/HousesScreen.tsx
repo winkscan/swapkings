@@ -213,7 +213,18 @@ function AddHouseModal({
   return (
     <Portal>
       <Animated.View style={[StyleSheet.absoluteFill, { opacity }]}>
-        <BlurView intensity={45} tint="dark" style={StyleSheet.absoluteFill} />
+        {/* expo-blur's default Android backend is a weak/no-op tint on many
+            devices — confirmed live, 2026-09-17: no visible blur at all.
+            dimezisBlurView is expo-blur's own bundled real-blur
+            implementation for Android (no extra native install), so this
+            needs the prop set explicitly rather than relying on the
+            cross-platform default. */}
+        <BlurView
+          intensity={45}
+          tint="dark"
+          experimentalBlurMethod="dimezisBlurView"
+          style={StyleSheet.absoluteFill}
+        />
         <Pressable style={StyleSheet.absoluteFill} onPress={onDismiss} />
         <View style={styles.modalPositioner} pointerEvents="box-none">
           <View style={styles.modalContainer}>{children}</View>
