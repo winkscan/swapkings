@@ -8,6 +8,7 @@ import React from "react";
 import * as Screens from "../screens";
 import { HomeNavigator } from "./HomeNavigator";
 import { StatusBar } from "expo-status-bar";
+import { OnboardingModal } from "../components/OnboardingModal";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -65,6 +66,7 @@ export const AppNavigator = ({ navTheme }: NavigationProps) => {
     <NavigationContainer theme={navTheme}>
       <StatusBar style="light" />
       <AppStack />
+      <OnboardingModal />
     </NavigationContainer>
   );
 };
