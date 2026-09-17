@@ -25,7 +25,11 @@ import { SWAPKINGS_COLORS as C } from '../theme'
 const PRESETS: Record<string, { mint: string; decimals: number }> = {
   SOL: { mint: 'So11111111111111111111111111111111111111112', decimals: 9 },
   USDC: { mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', decimals: 6 },
-  BONK: { mint: 'DezXAZ8z7PnrnRJjz3wXBoRg2r33fT3RnV3ycW7c7C9V', decimals: 5 },
+  // Was a typo'd mint (one char off — Dez...g2r33... instead of gixCa6...)
+  // that doesn't exist in Jupiter's index at all, confirmed live 2026-09-18:
+  // real BONK's icon (and any quote against it) silently had nothing to
+  // resolve. Not an icon-fetching bug — the wrong token entirely.
+  BONK: { mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', decimals: 5 },
   JUP: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', decimals: 6 },
 }
 const PRESET_KEYS = Object.keys(PRESETS)

@@ -7,6 +7,14 @@ export interface TokenInfo {
   name: string
   decimals: number
   icon?: string
+  // USD value of the token's on-chain liquidity pool(s), per Jupiter's own
+  // Token API v2 — used to filter out scam/impersonator tokens (fake "USDC",
+  // "COIN", etc — a wallet can hold dust from these via unsolicited airdrops)
+  // from the Swap picker's wallet-tokens list. A real scam mirror of an
+  // existing symbol has no real pool behind it, so this is reliably ~0 even
+  // though Jupiter still indexes its name/symbol metadata. See
+  // walletTokens.ts's own filter for the actual floor.
+  liquidityUsd?: number
 }
 
 export interface SearchedToken extends TokenInfo {
@@ -43,6 +51,7 @@ export async function getTokenInfos(mints: string[]): Promise<Record<string, Tok
       name: t.name,
       decimals: t.decimals,
       icon: t.icon,
+      liquidityUsd: Number(t.liquidity ?? 0),
     }
   }
   return out

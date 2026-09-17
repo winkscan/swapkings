@@ -7,6 +7,16 @@ export interface WalletToken extends TokenInfo {
   uiAmount: number
 }
 
+// Below this, treat a held token as a scam/impersonator airdrop rather than
+// something worth offering to swap — a spoofed "USDC"/"COIN"/etc has no real
+// pool behind it (Jupiter still indexes its name/symbol either way), so
+// liquidity reliably sits near $0 while every real token, however small,
+// clears this easily (confirmed live 2026-09-18: the wallet's actual junk —
+// COIN, two fake "USDC" mints, TITS — all had ~$0 liquidity in Jupiter's own
+// data). Not a market-cap floor like Guilds' own — this only needs to catch
+// "no real pool exists," not gauge how big a real token's community is.
+const WALLET_TOKEN_LIQUIDITY_FLOOR_USD = 1_000
+
 // Real SPL token accounts the wallet holds, enriched with Jupiter's
 // off-chain metadata so the Sell/Buy token pickers can show "what's
 // actually in your wallet" alongside the preset list, with a balance next
@@ -31,7 +41,7 @@ export async function getWalletTokens(connection: Connection, owner: PublicKey):
   const infos = await getTokenInfos(held.map((h) => h.mint))
 
   return held
-    .filter((h) => infos[h.mint])
+    .filter((h) => infos[h.mint] && (infos[h.mint].liquidityUsd ?? 0) >= WALLET_TOKEN_LIQUIDITY_FLOOR_USD)
     .map((h) => ({ mint: h.mint, uiAmount: h.uiAmount, ...infos[h.mint] }))
     .sort((a, b) => b.uiAmount - a.uiAmount)
 }
