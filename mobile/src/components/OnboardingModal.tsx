@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Animated, Image, Pressable, StyleSheet, View } from 'react-native'
+import { Animated, Dimensions, Image, Pressable, StyleSheet, View } from 'react-native'
 import { Button, Checkbox, Portal, Text, TouchableRipple } from 'react-native-paper'
 import { BlurView } from 'expo-blur'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
@@ -8,6 +8,16 @@ import { useNavigation } from '@react-navigation/native'
 import { SWAPKINGS_COLORS as C } from '../theme'
 
 const DISMISSED_KEY = 'swapkings.onboardingDismissed.v1'
+
+// Explicit pixel height instead of the `aspectRatio` style — confirmed live
+// 2026-09-18 that Image + aspectRatio silently ignored the container's
+// resolved width on-device and fell back to the webp's own native pixel
+// size instead (over 1000px tall), pushing the whole card's body content
+// off the bottom of the screen. Computed the same way the panel-width
+// constants elsewhere in this app are (e.g. SwapScreen.tsx's own
+// TOKEN_MENU_WIDTH) — app is portrait-locked, so this is stable.
+const CARD_WIDTH = Dimensions.get('window').width - 40
+const IMAGE_HEIGHT = Math.round((CARD_WIDTH * 9) / 16)
 
 // Same copy/images/flow as the web app's own OnboardingModal.tsx — shown
 // once per fresh app open unless "Don't show this again" is checked.
@@ -161,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 1,
   },
-  image: { width: '100%', aspectRatio: 16 / 9 },
+  image: { width: '100%', height: IMAGE_HEIGHT },
   body: { padding: 20 },
   progressRow: { flexDirection: 'row', gap: 6, marginBottom: 12 },
   progressSeg: { flex: 1, height: 4, borderRadius: 2, backgroundColor: C.bgInput },
