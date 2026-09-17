@@ -359,6 +359,8 @@ function AddHouseForm({ guilds, onAdd }: { guilds: GuildRow[]; onAdd: (row: Guil
     }
   }
 
+  const canAdd = !checking && !!trimmed && !existing
+
   return (
     <View>
       <Text variant="titleLarge" style={styles.addTitle}>
@@ -377,12 +379,12 @@ function AddHouseForm({ guilds, onAdd }: { guilds: GuildRow[]; onAdd: (row: Guil
       />
       <Button
         mode="contained"
-        buttonColor={C.bgHover}
-        textColor={C.textPrimary}
+        buttonColor={canAdd ? C.accent : C.bgHover}
+        textColor={canAdd ? C.accentTextOn : C.textPrimary}
         style={styles.addSubmitBtn}
         contentStyle={styles.addBtnContent}
         onPress={handleAdd}
-        disabled={checking || !trimmed || !!existing}
+        disabled={!canAdd}
         loading={checking}
         icon={({ size, color }) => <FontAwesome6 name="plus" size={size * 0.75} color={color} />}
       >
@@ -393,9 +395,12 @@ function AddHouseForm({ guilds, onAdd }: { guilds: GuildRow[]; onAdd: (row: Guil
         {formatUsdCompact(GUILD_MARKET_CAP_FLOOR_USD)} market cap.
       </Text>
       {existing ? (
-        <Text variant="bodySmall" style={styles.addHelper}>
-          {existing.symbol || shortAddr(existing.tokenMint)} is already in the list.
-        </Text>
+        <View style={styles.alreadyBanner}>
+          <FontAwesome6 name="triangle-exclamation" size={20} color={C.accent} />
+          <Text style={styles.alreadyBannerText}>
+            {existing.symbol || shortAddr(existing.tokenMint)} is already in the list.
+          </Text>
+        </View>
       ) : null}
       {!existing && error ? (
         <Text variant="bodySmall" style={[styles.addHelper, styles.errorText]}>
@@ -488,4 +493,17 @@ const styles = StyleSheet.create({
   addInput: { width: '100%', height: 40, backgroundColor: 'transparent', marginBottom: 20 },
   addSubmitBtn: { width: '100%', borderRadius: 16 },
   addHelper: { color: C.textSecondary, marginTop: 10 },
+  // Same shape as the Friends page's own referred-by banner — just a yellow
+  // alert icon instead of the green checkmark (Alexey's explicit ask
+  // 2026-09-18).
+  alreadyBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: C.bgElevated,
+    borderRadius: 20,
+    padding: 16,
+    marginTop: 10,
+  },
+  alreadyBannerText: { color: C.textSecondary, fontSize: 13, flexShrink: 1 },
 })
