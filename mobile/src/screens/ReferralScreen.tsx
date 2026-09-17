@@ -23,18 +23,26 @@ import { SWAPKINGS_COLORS as C } from '../theme'
 // common design, take the example from the site"). The one deliberate
 // addition over web: a manual "enter a friend's code" field, since mobile
 // has no URL bar to capture `?ref=` from — see referral.ts's own comment.
+// Two explicit rows (values, then labels) rather than two independently
+// laid-out columns — the earlier version let the left column's icon+label
+// row grow 6px taller than the right column's bare label, so the two value
+// numbers didn't sit on the same line even with alignItems:'center' on the
+// parent (confirmed live 2026-09-17, screenshot). Putting both values in one
+// flex row (and both labels in another) makes them siblings on the same line
+// by construction, not by hoping two separately-built columns end up the
+// same height.
 function FriendsSummaryCard({ friendCount, totalEarnedUsd, loading }: { friendCount: number; totalEarnedUsd: number; loading: boolean }) {
   return (
     <View style={styles.summaryCard}>
-      <View>
+      <View style={styles.summaryValueRow}>
         <Text style={styles.summaryValue}>{loading ? '…' : friendCount}</Text>
-        <View style={styles.summaryLabelRow}>
+        <Text style={styles.summaryValue}>{loading ? '…' : formatUsdCompact(totalEarnedUsd)}</Text>
+      </View>
+      <View style={styles.summaryLabelRow}>
+        <View style={styles.summaryLabelLeft}>
           <FontAwesome6 name="user-group" size={12} color="rgba(0,0,0,0.6)" />
           <Text style={styles.summaryLabel}>Friends invited</Text>
         </View>
-      </View>
-      <View style={{ alignItems: 'flex-end' }}>
-        <Text style={styles.summaryValue}>{loading ? '…' : formatUsdCompact(totalEarnedUsd)}</Text>
         <Text style={styles.summaryLabel}>Total earned</Text>
       </View>
     </View>
@@ -155,7 +163,7 @@ export function ReferralScreen() {
             <>
               <Button
                 mode="contained"
-                style={styles.btnRadius}
+                style={[styles.btnRadius, styles.inviteBtnMain]}
                 icon={({ size, color }) => (
                   <FontAwesome6 name={copied ? 'check' : 'copy'} size={size} color={color} />
                 )}
@@ -173,7 +181,7 @@ export function ReferralScreen() {
               onPress={onClaim}
               loading={claiming}
               disabled={claiming}
-              style={styles.btnRadius}
+              style={[styles.btnRadius, styles.inviteBtnMain]}
               icon={({ size, color }) => <FontAwesome6 name="user-plus" size={size * 0.85} color={color} />}
             >
               {claiming ? 'Getting your link…' : 'Get my link'}
@@ -262,18 +270,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
+  summaryValueRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   summaryValue: { fontSize: 22, fontWeight: '700', color: '#000' },
-  summaryLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
+  summaryLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 },
+  summaryLabelLeft: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   summaryLabel: { fontSize: 12, color: 'rgba(0,0,0,0.6)' },
 
-  inviteCard: { alignItems: 'center' },
+  inviteCard: { alignItems: 'flex-start' },
   inviteTitle: { color: C.textPrimary, fontWeight: '700' },
-  inviteSubtitle: { color: C.textSecondary, marginTop: 4, marginBottom: 16, textAlign: 'center' },
-  inviteBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  inviteSubtitle: { color: C.textSecondary, marginTop: 4, marginBottom: 16, textAlign: 'left' },
+  inviteBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 10, width: '100%' },
+  inviteBtnMain: { flex: 1 },
   shareBtn: {
     width: 40,
     height: 40,
@@ -287,7 +295,7 @@ const styles = StyleSheet.create({
   codeSavedText: { color: C.textPrimary },
 
   tableCard: {},
-  emptyText: { color: C.textSecondary, textAlign: 'center', paddingVertical: 8 },
+  emptyText: { color: C.textSecondary, textAlign: 'left' },
   headerRow: {
     flexDirection: 'row',
     borderBottomWidth: StyleSheet.hairlineWidth,
