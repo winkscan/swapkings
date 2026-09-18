@@ -3,15 +3,10 @@
     "name": "SwapKings",
     "slug": "swapkings",
     "scheme": "swapkings",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#090d10"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -34,7 +29,15 @@
     },
     "plugins": [
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#090d10"
+        }
+      ]
     ],
     "extra": {
       "eas": {
