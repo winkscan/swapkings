@@ -391,7 +391,7 @@ function AddHouseForm({ guilds, onAdd }: { guilds: GuildRow[]; onAdd: (row: Guil
         {checking ? 'Checking…' : 'Add'}
       </Button>
       <Text variant="bodySmall" style={styles.addHelper}>
-        Supports tokens from pump.fun, letsbonk.fun, Meteora, Jupiter Studio, and Moonshot, above a{' '}
+        Supports tokens from pump.fun, letsbonk.fun, Meteora, Jupiter Studio, Moonshot, and Stonkfun, above a{' '}
         {formatUsdCompact(GUILD_MARKET_CAP_FLOOR_USD)} market cap.
       </Text>
       {existing ? (

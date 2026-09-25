@@ -277,7 +277,7 @@ function AddTokenForm({ guilds, onAdd }: { guilds: GuildRow[]; onAdd: (row: Guil
         </button>
       </div>
       <div className="text-secondary" style={{ marginTop: 10, fontSize: 12 }}>
-        Supports tokens from pump.fun, letsbonk.fun, Meteora, Jupiter Studio, and Moonshot, above a{' '}
+        Supports tokens from pump.fun, letsbonk.fun, Meteora, Jupiter Studio, Moonshot, and Stonkfun, above a{' '}
         {formatUsdCompact(GUILD_MARKET_CAP_FLOOR_USD)} market cap.
       </div>
       {existing && (

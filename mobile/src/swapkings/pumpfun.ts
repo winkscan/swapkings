@@ -53,7 +53,16 @@ export const GUILD_MARKET_CAP_FLOOR_USD = 100_000
 // per-token founder), confirming the original suspicion. Routing 90% of a
 // swapper's fee to the wrong kind of address is exactly the failure mode
 // worth staying conservative about.
-const QUALIFYING_LAUNCHPADS = new Set(['pump.fun', 'letsbonk.fun', 'met-dbc', 'jup-studio', 'moonshot'])
+//
+// stonkfun added 2026-09-25 after the same check: Jupiter tags it
+// `launchpad: "stonkfun"` (201 tokens seen across discovery windows), each
+// token has its own `dev` creator wallet (a handful of wallets launch 2-6
+// tokens each — normal repeat launchers, plus the platform team's own wallet
+// for STONK itself and a few official tokens; no single shared factory
+// address across unrelated tokens like metadao), and the creator earns an
+// ongoing share of every trade (0.5% or 1% of the pool fee, paid to their
+// wallet) — a real, permissionless, per-token economic stake.
+const QUALIFYING_LAUNCHPADS = new Set(['pump.fun', 'letsbonk.fun', 'met-dbc', 'jup-studio', 'moonshot', 'stonkfun'])
 
 interface JupiterTokenSearchResult {
   id?: string

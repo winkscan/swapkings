@@ -182,7 +182,7 @@ export function GuideScreen() {
         <View style={styles.infoBox}>
           <Text style={styles.infoBoxTitle}>Supported launchpads today</Text>
           <Text style={styles.infoBoxText}>
-            pump.fun, letsbonk.fun, Meteora, Jupiter Studio, and Moonshot
+            pump.fun, letsbonk.fun, Meteora, Jupiter Studio, Moonshot, and Stonkfun
           </Text>
           <Text style={styles.infoBoxNote}>
             We only ever route real money to a wallet we can verify is a token's actual creator —

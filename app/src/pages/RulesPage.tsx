@@ -86,7 +86,7 @@ export function RulesPage() {
           <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4, fontSize: 13 }}>
             Supported launchpads today
           </div>
-          <div style={{ fontSize: 13 }}>pump.fun, letsbonk.fun, Meteora, Jupiter Studio, and Moonshot</div>
+          <div style={{ fontSize: 13 }}>pump.fun, letsbonk.fun, Meteora, Jupiter Studio, Moonshot, and Stonkfun</div>
           <div style={{ fontSize: 12, marginTop: 8 }}>
             We only ever route real money to a wallet we can verify is a token's actual creator —
             confirmed automatically through the token's own on-chain launch data, never a manual
