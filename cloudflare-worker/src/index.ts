@@ -532,6 +532,53 @@ async function handleJupiterProxy(request: Request, env: Env, jupPath: string): 
   })
 }
 
+// Token search (symbol/name/mint list), cached at Cloudflare's edge. Confirmed
+// live 2026-10-19: the browser calling lite-api.jup.ag/tokens/v2/search
+// directly got HTTP 429 on page load (that endpoint's rate limit is per
+// client IP and shared with every other site's visitors on the same network),
+// and since the client treated any non-OK as "empty", SOL/USDC showed as raw
+// mint addresses and the picker said "No tokens found" for "ore" even though
+// the same query succeeds seconds later. Going through here means one
+// upstream call per distinct query per 5 minutes for ALL visitors combined,
+// authenticated with the Worker-side key; falls back to the keyless lite
+// endpoint if the keyed one refuses. Only successful (200) responses are
+// cached, so a transient upstream failure never gets stuck for 5 minutes.
+async function handleTokenSearch(request: Request, env: Env): Promise<Response> {
+  const query = new URL(request.url).searchParams.get('query')
+  if (!query || query.length > 2000) {
+    return new Response(JSON.stringify({ error: 'bad query' }), { status: 400, headers: CORS_HEADERS })
+  }
+
+  const cache = caches.default
+  const cacheKey = new Request(request.url, { method: 'GET' })
+  const cachedRes = await cache.match(cacheKey)
+  if (cachedRes) return cachedRes
+
+  const encoded = encodeURIComponent(query)
+  let upstream = await fetch(`https://api.jup.ag/tokens/v2/search?query=${encoded}`, {
+    headers: { 'x-api-key': env.JUPITER_API_KEY },
+  })
+  if (!upstream.ok) {
+    upstream = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${encoded}`)
+  }
+  if (!upstream.ok) {
+    return new Response(JSON.stringify({ error: 'upstream failed', status: upstream.status }), {
+      status: 502,
+      headers: CORS_HEADERS,
+    })
+  }
+
+  const res = new Response(await upstream.text(), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=300',
+      'Access-Control-Allow-Origin': '*',
+    },
+  })
+  await cache.put(cacheKey, res.clone())
+  return res
+}
+
 // Reshapes the one combined cache payload back into the per-route shape each
 // route used to return on its own — keeps app/src/cacheWorker.ts and every
 // hook reading from it (useGuilds.ts, useAllTimeVolume.ts, etc.) unchanged.
@@ -553,6 +600,7 @@ export default {
     if (path === '/icon') return handleIconProxy(request)
     if (path === '/founder-attestation') return handleFounderAttestation(request, env)
     if (path === '/rpc') return handleRpcProxy(request, env)
+    if (path === '/jup/tokens-search') return handleTokenSearch(request, env)
     if (path === '/jup/quote') return handleJupiterProxy(request, env, '/quote')
     if (path === '/jup/swap-instructions') return handleJupiterProxy(request, env, '/swap-instructions')
     if (!ROUTES.has(path)) {

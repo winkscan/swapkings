@@ -1,6 +1,7 @@
 // Off-chain token metadata + USD pricing, both from Jupiter's free "lite" tier —
 // no API key needed. Used purely for display (which pool is worth the most, $
 // amounts on the winners lists); never touches program logic.
+import { cacheWorkerUrl } from './cacheWorker'
 
 export interface TokenInfo {
   symbol: string
@@ -39,11 +40,41 @@ export function dexscreenerBannerUrl(mint: string): string {
   return `https://dd.dexscreener.com/ds-data/tokens/solana/${mint}/header.png`
 }
 
+// Every Token API v2 "search" call goes through here. Hitting
+// lite-api.jup.ag directly 429s (confirmed live 2026-10-19 on the web app:
+// SOL/USDC showed as raw mint addresses and the picker said "No tokens
+// found") because that rate limit is per client IP, shared with everyone
+// else on the same network. The cache Worker's /jup/tokens-search route calls
+// Jupiter once per query per 5 minutes for all users and is tried first; the
+// direct call stays as the fallback. One retry on 429 since it clears fast.
+export async function fetchTokenSearch(query: string): Promise<any[] | null> {
+  const encoded = encodeURIComponent(query)
+  const base = cacheWorkerUrl()
+  if (base) {
+    try {
+      const res = await fetch(`${base}/jup/tokens-search?query=${encoded}`)
+      if (res.ok) return await res.json()
+    } catch {
+      // fall through to the direct call
+    }
+  }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${encoded}`)
+      if (res.ok) return await res.json()
+      if (res.status !== 429) return null
+    } catch {
+      return null
+    }
+    await new Promise((r) => setTimeout(r, 800))
+  }
+  return null
+}
+
 export async function getTokenInfos(mints: string[]): Promise<Record<string, TokenInfo>> {
   if (mints.length === 0) return {}
-  const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${mints.join(',')}`)
-  if (!res.ok) return {}
-  const data = await res.json()
+  const data = await fetchTokenSearch(mints.join(','))
+  if (!data) return {}
   const out: Record<string, TokenInfo> = {}
   for (const t of data) {
     out[t.id ?? t.address] = {
@@ -74,9 +105,8 @@ export async function getUsdPrices(mints: string[]): Promise<Record<string, numb
 export async function searchTokens(query: string): Promise<SearchedToken[]> {
   const q = query.trim()
   if (!q) return []
-  const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${encodeURIComponent(q)}`)
-  if (!res.ok) return []
-  const data = await res.json()
+  const data = await fetchTokenSearch(q)
+  if (!data) return []
   return (data as any[]).slice(0, 30).map((t) => ({
     mint: t.id ?? t.address,
     symbol: t.symbol,

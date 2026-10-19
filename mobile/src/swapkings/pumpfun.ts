@@ -13,6 +13,8 @@
 // `dev` field (confirmed identical to pump.fun's own `creator` field on a
 // real token) plus a `launchpad` tag — and, unlike pump.fun's API, is already
 // proven to work from the browser in this codebase.
+import { fetchTokenSearch } from './jupiterInfo'
+
 export interface PumpFunTokenInfo {
   mint: string
   creator: string
@@ -97,9 +99,8 @@ function toPumpFunInfo(t: JupiterTokenSearchResult): PumpFunTokenInfo | null {
 
 export async function getPumpFunTokenInfo(mint: string): Promise<PumpFunTokenInfo | null> {
   try {
-    const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${mint}`)
-    if (!res.ok) return null
-    const data: JupiterTokenSearchResult[] = await res.json()
+    const data: JupiterTokenSearchResult[] | null = await fetchTokenSearch(mint)
+    if (!data) return null
     const token = data.find((t) => (t.id ?? t.address) === mint)
     if (!token) return null
     // Only QUALIFYING_LAUNCHPADS tokens qualify as guilds — `dev` is
@@ -130,9 +131,8 @@ export interface TokenMarketInfo {
 export async function getTokenMarketInfos(mints: string[]): Promise<Record<string, TokenMarketInfo>> {
   if (mints.length === 0) return {}
   try {
-    const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${mints.join(',')}`)
-    if (!res.ok) return {}
-    const data: JupiterTokenSearchResult[] = await res.json()
+    const data: JupiterTokenSearchResult[] | null = await fetchTokenSearch(mints.join(','))
+    if (!data) return {}
     const out: Record<string, TokenMarketInfo> = {}
     for (const t of data) {
       const mint = t.id ?? t.address
