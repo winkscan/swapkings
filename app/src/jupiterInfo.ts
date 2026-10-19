@@ -59,6 +59,32 @@ export async function fetchTokenSearch(query: string): Promise<any[] | null> {
   return null
 }
 
+// Same idea for the Token API v2 ranking lists (e.g. 'toptrending/1h',
+// 'recent') the Crews discovery page reads — see fetchTokenSearch above and
+// the Worker's handleTokenList. Retries once on 429 on the direct fallback.
+export async function fetchTokenList(path: string): Promise<any[] | null> {
+  const base = cacheWorkerUrl()
+  if (base) {
+    try {
+      const res = await fetch(`${base}/jup/tokens-list?path=${encodeURIComponent(path)}`)
+      if (res.ok) return await res.json()
+    } catch {
+      // fall through to the direct call
+    }
+  }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(`https://lite-api.jup.ag/tokens/v2/${path}?limit=100`)
+      if (res.ok) return await res.json()
+      if (res.status !== 429) return null
+    } catch {
+      return null
+    }
+    await new Promise((r) => setTimeout(r, 800))
+  }
+  return null
+}
+
 export async function getTokenInfos(mints: string[]): Promise<Record<string, TokenInfo>> {
   if (mints.length === 0) return {}
   const data = await fetchTokenSearch(mints.join(','))

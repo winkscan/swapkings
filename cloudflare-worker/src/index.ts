@@ -579,6 +579,62 @@ async function handleTokenSearch(request: Request, env: Env): Promise<Response> 
   return res
 }
 
+// The 11 Token API v2 ranking lists the Crews discovery page reads on every
+// load (see app/src/pumpfun.ts's DISCOVERY_PATHS). Fired straight from the
+// browser those 11 parallel calls are themselves what trips lite-api's
+// per-IP 429 (confirmed live 2026-10-19: ~half of them failed, so the Crews
+// list was silently missing tokens). Same edge-cache approach as
+// handleTokenSearch; `path` is checked against this fixed allowlist so the
+// route can't become an open proxy to arbitrary Jupiter paths.
+const TOKEN_LIST_PATHS = new Set([
+  'toporganicscore/24h',
+  'toporganicscore/6h',
+  'toporganicscore/1h',
+  'toporganicscore/5m',
+  'toptrending/24h',
+  'toptrending/6h',
+  'toptrending/1h',
+  'toptraded/24h',
+  'toptraded/6h',
+  'toptraded/1h',
+  'recent',
+])
+
+async function handleTokenList(request: Request, env: Env): Promise<Response> {
+  const path = new URL(request.url).searchParams.get('path')
+  if (!path || !TOKEN_LIST_PATHS.has(path)) {
+    return new Response(JSON.stringify({ error: 'path not allowed' }), { status: 400, headers: CORS_HEADERS })
+  }
+
+  const cache = caches.default
+  const cacheKey = new Request(request.url, { method: 'GET' })
+  const cachedRes = await cache.match(cacheKey)
+  if (cachedRes) return cachedRes
+
+  let upstream = await fetch(`https://api.jup.ag/tokens/v2/${path}?limit=100`, {
+    headers: { 'x-api-key': env.JUPITER_API_KEY },
+  })
+  if (!upstream.ok) {
+    upstream = await fetch(`https://lite-api.jup.ag/tokens/v2/${path}?limit=100`)
+  }
+  if (!upstream.ok) {
+    return new Response(JSON.stringify({ error: 'upstream failed', status: upstream.status }), {
+      status: 502,
+      headers: CORS_HEADERS,
+    })
+  }
+
+  const res = new Response(await upstream.text(), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=300',
+      'Access-Control-Allow-Origin': '*',
+    },
+  })
+  await cache.put(cacheKey, res.clone())
+  return res
+}
+
 // Reshapes the one combined cache payload back into the per-route shape each
 // route used to return on its own — keeps app/src/cacheWorker.ts and every
 // hook reading from it (useGuilds.ts, useAllTimeVolume.ts, etc.) unchanged.
@@ -601,6 +657,7 @@ export default {
     if (path === '/founder-attestation') return handleFounderAttestation(request, env)
     if (path === '/rpc') return handleRpcProxy(request, env)
     if (path === '/jup/tokens-search') return handleTokenSearch(request, env)
+    if (path === '/jup/tokens-list') return handleTokenList(request, env)
     if (path === '/jup/quote') return handleJupiterProxy(request, env, '/quote')
     if (path === '/jup/swap-instructions') return handleJupiterProxy(request, env, '/swap-instructions')
     if (!ROUTES.has(path)) {

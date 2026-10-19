@@ -13,7 +13,7 @@
 // `dev` field (confirmed identical to pump.fun's own `creator` field on a
 // real token) plus a `launchpad` tag — and, unlike pump.fun's API, is already
 // proven to work from the browser in this codebase.
-import { fetchTokenSearch } from './jupiterInfo'
+import { fetchTokenSearch, fetchTokenList } from './jupiterInfo'
 
 export interface PumpFunTokenInfo {
   mint: string
@@ -164,31 +164,25 @@ export async function getTokenMarketInfos(mints: string[]): Promise<Record<strin
 // found several real, qualifying tokens that only showed up via those 4 —
 // i.e. real houses this list was silently missing. Same one-call-per-window
 // cost shape as before, just more of them.
-const DISCOVERY_ENDPOINTS = [
-  'https://lite-api.jup.ag/tokens/v2/toporganicscore/24h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toporganicscore/6h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toporganicscore/1h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toporganicscore/5m?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toptrending/24h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toptrending/6h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toptrending/1h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toptraded/24h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toptraded/6h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/toptraded/1h?limit=100',
-  'https://lite-api.jup.ag/tokens/v2/recent?limit=100',
+// Paths under /tokens/v2/ — fetched via fetchTokenList (cache Worker first,
+// direct fallback); keep in sync with TOKEN_LIST_PATHS in the Worker.
+const DISCOVERY_PATHS = [
+  'toporganicscore/24h',
+  'toporganicscore/6h',
+  'toporganicscore/1h',
+  'toporganicscore/5m',
+  'toptrending/24h',
+  'toptrending/6h',
+  'toptrending/1h',
+  'toptraded/24h',
+  'toptraded/6h',
+  'toptraded/1h',
+  'recent',
 ]
 
 export async function getPumpFunCandidates(): Promise<PumpFunTokenInfo[]> {
   const results = await Promise.all(
-    DISCOVERY_ENDPOINTS.map(async (url) => {
-      try {
-        const res = await fetch(url)
-        if (!res.ok) return []
-        return (await res.json()) as JupiterTokenSearchResult[]
-      } catch {
-        return []
-      }
-    }),
+    DISCOVERY_PATHS.map(async (path) => ((await fetchTokenList(path)) ?? []) as JupiterTokenSearchResult[]),
   )
 
   const byMint = new Map<string, PumpFunTokenInfo>()
